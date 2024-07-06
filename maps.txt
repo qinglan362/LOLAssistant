@@ -1,0 +1,72 @@
+name: 云顶之弈 (双人作战 beta测试)
+mapId: 22
+id: 1160
+
+name: 云顶之弈（匹配模式）
+mapId: 22
+id: 2200
+
+name: 排位赛 单排/双排
+mapId: 11
+id: 420
+
+name: 斗魂竞技场
+mapId: 30
+id: 1700
+
+name: 斗魂竞技场
+mapId: 30
+id: 1710
+
+name: 匹配模式
+mapId: 11
+id: 430
+
+name: 排位赛 灵活排位
+mapId: 11
+id: 440
+
+name: 云顶之弈（匹配模式）
+mapId: 22
+id: 1090
+
+name: 极地大乱斗
+mapId: 12
+id: 450
+
+name: 云顶之弈 (排位赛)
+mapId: 22
+id: 1100
+
+name: 新手教程 第一部分
+mapId: 11
+id: 2000
+
+name: 新手教程 第二部分
+mapId: 11
+id: 2010
+
+name: 新手教程 第三部分
+mapId: 11
+id: 2020
+
+name: 新：入门级
+mapId: 11
+id: 870
+
+name: 5周年时光机
+mapId: 22
+id: 6120
+
+name: 云顶之弈(狂暴模式)
+mapId: 22
+id: 1130
+
+name: 新：新手级
+mapId: 11
+id: 880
+
+name: 新：一般级
+mapId: 11
+id: 890
+
