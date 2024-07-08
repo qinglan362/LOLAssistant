@@ -6,7 +6,11 @@ const routes = [
     name: 'ZhanJi',
     component: ZhanJi
   },
-
+  {
+    path: '/gongju',
+    name: 'gongju',
+    component: () => import(/* webpackChunkName: "gongju" */ '../views/ToolsViedw.vue')
+  }
 ]
 
 const router = createRouter({

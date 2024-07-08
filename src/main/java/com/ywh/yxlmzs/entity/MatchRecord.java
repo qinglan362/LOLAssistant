@@ -1,4 +1,4 @@
-package com.ywh.yxlmzs.api.entity;
+package com.ywh.yxlmzs.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.ywh.yxlmzs.api.service;
+package com.ywh.yxlmzs.service;
 
 import kong.unirest.JsonNode;
 import kong.unirest.JsonResponse;

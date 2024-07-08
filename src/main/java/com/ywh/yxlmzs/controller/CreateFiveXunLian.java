@@ -1,4 +1,4 @@
-package com.ywh.yxlmzs.api.controller;
+package com.ywh.yxlmzs.controller;
 
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;

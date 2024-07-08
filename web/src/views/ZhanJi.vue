@@ -2,7 +2,8 @@
 import { ElMessage } from 'element-plus'
 import $ from 'jquery'
 import { ref} from "vue";
-const  name=ref('')
+const  name=ref('Love#85916')
+const  MatchHistory=ref([])
 const getInfo=()=>{
   $.ajax({
     url: "http://localhost:8089/matchesFromPuuid",
@@ -12,19 +13,8 @@ const getInfo=()=>{
     },
     success(resp) {
       console.log(resp)
-    },
-    error(resp) {
-      console.log(resp)
-      ElMessage.error(resp.msg);
-    }
-  });
-}
-const create55xunlian=()=>{
-  $.ajax({
-    url: "http://localhost:8089/createFiveXunLian",
-    type: "Post",
-    success(resp) {
-      console.log(resp)
+      MatchHistory.value=resp
+      console.log(MatchHistory.value[0][0].gameName)
     },
     error(resp) {
       console.log(resp)
@@ -40,18 +30,20 @@ const create55xunlian=()=>{
       style="max-width: 600px"
   >
     <el-form-item label="昵称">
-      <el-input v-model="name" /> <el-button type="primary" @click="getInfo">获取战绩</el-button>
-    </el-form-item>
 
-  </el-form>
-  <el-form
-      label-width="auto"
-      style="max-width: 600px"
-  >
-    <el-form-item label="">
+      <el-input v-model="name"  style="width: 200px"/>
+      <el-button  type="primary" style="margin-left: 20px" @click="getInfo">
+        获取战绩
+      </el-button>
     </el-form-item>
-    <el-button type="primary" @click="create55xunlian">创建55训练模式</el-button>
   </el-form>
+
+  <el-table :data="MatchHistory" stripe style="width: 100%">
+    <el-table-column prop="Object.gameName" label="gameName" width="180" />
+    <el-table-column prop="deaths" label="deaths" width="180" />
+    <el-table-column prop="address" label="Address" />
+  </el-table>
+
 </template>
 
 <style scoped>

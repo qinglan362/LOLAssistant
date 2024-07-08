@@ -1,12 +1,12 @@
-package com.ywh.yxlmzs.api.controller;
+package com.ywh.yxlmzs.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ywh.yxlmzs.api.entity.Champion;
-import com.ywh.yxlmzs.api.entity.MatchRecord;
-import com.ywh.yxlmzs.api.service.GetGameFromGameId;
-import com.ywh.yxlmzs.api.service.GetSummoners;
+import com.ywh.yxlmzs.entity.Champion;
+import com.ywh.yxlmzs.entity.MatchRecord;
+import com.ywh.yxlmzs.service.GetGameFromGameId;
+import com.ywh.yxlmzs.service.GetSummoners;
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
