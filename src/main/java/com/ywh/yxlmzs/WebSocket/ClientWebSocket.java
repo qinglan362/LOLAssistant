@@ -11,14 +11,20 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class ClientWebSocket extends TextWebSocketHandler {
 
 
+//    @Override
+//    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+//        // 订阅
+//        String subscribeMessage = "[5, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]";
+//        session.sendMessage(new TextMessage(subscribeMessage));
+//        //取消订阅
+//        String unsubscribeMessage = "[6, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]";
+//        session.sendMessage(new TextMessage(unsubscribeMessage));
+//    }
+   private WebSocketSession session;
+
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        // 订阅
-        String subscribeMessage = "[5, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]";
-        session.sendMessage(new TextMessage(subscribeMessage));
-        //取消订阅
-        String unsubscribeMessage = "[6, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]";
-        session.sendMessage(new TextMessage(unsubscribeMessage));
+        this.session = session;
     }
 
     @Override
@@ -43,5 +49,17 @@ public class ClientWebSocket extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         // 处理连接关闭事件
         System.out.println("Connection closed: " + session.getId());
+    }
+
+    public void subscribe(String subscribeMessage) throws Exception {
+        // 订阅
+        session.sendMessage(new TextMessage(subscribeMessage));
+        System.out.println("订阅成功: " + subscribeMessage);
+    }
+
+    public void unsubscribe(String unsubscribeMessage) throws Exception {
+        //取消订阅
+        session.sendMessage(new TextMessage(unsubscribeMessage));
+        System.out.println("取消订阅成功: " + unsubscribeMessage);
     }
 }

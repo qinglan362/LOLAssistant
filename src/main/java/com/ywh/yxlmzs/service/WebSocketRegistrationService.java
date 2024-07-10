@@ -8,8 +8,11 @@ import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import javax.net.ssl.SSLContext;
 import java.util.Base64;
+
 @Service
 public class WebSocketRegistrationService {
+
+    private ClientWebSocket clientWebSocket;
 
     public void registerWebSocketHandler(String path, String username, String password) throws Exception {
         SSLContext sslContext = WebSocketSSL.createTrustAllSSLContext();
@@ -17,7 +20,8 @@ public class WebSocketRegistrationService {
         // 创建WebSocket客户端并设置SSLContext
         StandardWebSocketClient client = new StandardWebSocketClient();
         client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
-        WebSocketConnectionManager manager = new WebSocketConnectionManager(client, new ClientWebSocket(), path);
+        clientWebSocket = new ClientWebSocket();
+        WebSocketConnectionManager manager = new WebSocketConnectionManager(client, clientWebSocket, path);
 
         // 添加Basic Auth认证信息到Header中
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
@@ -28,5 +32,9 @@ public class WebSocketRegistrationService {
 
         manager.setHeaders(headers);
         manager.start();
+    }
+
+    public ClientWebSocket getClientWebSocket() {
+        return clientWebSocket;
     }
 }

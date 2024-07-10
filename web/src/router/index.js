@@ -10,6 +10,16 @@ const routes = [
     path: '/gongju',
     name: 'gongju',
     component: () => import(/* webpackChunkName: "gongju" */ '../views/ToolsViedw.vue')
+  },
+  {
+    path: '/current',
+    name: 'current',
+    component: () => import(/* webpackChunkName: "current" */ '../views/CurrentView.vue')
+  },
+  {
+    path: '/someone',
+    name: 'someone',
+    component: () => import(/* webpackChunkName: "someone" */ '../views/SomeoneView.vue')
   }
 ]
 

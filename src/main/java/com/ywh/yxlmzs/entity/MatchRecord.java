@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MatchRecord {
+    private String gameId;
     private String gameName;
     private Integer deaths;
     private Integer kills;
@@ -15,4 +16,6 @@ public class MatchRecord {
     private  String champLevel;
     private Boolean win;
     private  String championName;
+    private String date;
+    private String mapName;
 }

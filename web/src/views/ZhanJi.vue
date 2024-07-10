@@ -1,23 +1,19 @@
 <script setup>
-import { ElMessage } from 'element-plus'
-import $ from 'jquery'
-import { ref} from "vue";
-const  name=ref('Love#85916')
-const  MatchHistory=ref([])
-const getInfo=()=>{
+import $ from "jquery";
+import {ElMessage} from "element-plus";
+
+const getCurrent = () => {
   $.ajax({
-    url: "http://localhost:8089/matchesFromPuuid",
-    type: "Get",
+    url: "http://localhost:8089/StartWebSocketApi",
+    type: "GET",
     data: {
-      name:name.value,
+      message:"[6, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"
     },
     success(resp) {
-      console.log(resp)
-      MatchHistory.value=resp
-      console.log(MatchHistory.value[0][0].gameName)
+      console.log(resp);
     },
     error(resp) {
-      console.log(resp)
+      console.log(resp);
       ElMessage.error(resp.msg);
     }
   });
@@ -25,24 +21,17 @@ const getInfo=()=>{
 </script>
 
 <template>
-  <el-form
-      label-width="auto"
-      style="max-width: 600px"
-  >
-    <el-form-item label="昵称">
+      <router-link :to="{name:'someone'}">
+        <el-button  type="primary" >
+          获取某人战绩
+        </el-button>
+      </router-link>
 
-      <el-input v-model="name"  style="width: 200px"/>
-      <el-button  type="primary" style="margin-left: 20px" @click="getInfo">
-        获取战绩
-      </el-button>
-    </el-form-item>
-  </el-form>
-
-  <el-table :data="MatchHistory" stripe style="width: 100%">
-    <el-table-column prop="Object.gameName" label="gameName" width="180" />
-    <el-table-column prop="deaths" label="deaths" width="180" />
-    <el-table-column prop="address" label="Address" />
-  </el-table>
+      <router-link :to="{name:'current'}">
+        <el-button  type="primary" style="margin-left: 100px" @click="getCurrent">
+          获取当前队友战绩
+        </el-button>
+      </router-link>
 
 </template>
 
