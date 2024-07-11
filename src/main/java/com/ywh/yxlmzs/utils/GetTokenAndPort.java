@@ -1,8 +1,11 @@
 package com.ywh.yxlmzs.utils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,43 +14,25 @@ import static java.lang.Thread.sleep;
 @Service
 public class GetTokenAndPort {
 
-        public void getPortAndToken() {
-            String batFilePath = Paths.get("run_as_admin.bat").toAbsolutePath().toString();
-
+        public void getPortAndToken() throws IOException {
+                    //执行static/run_as_admin.bat
+            ClassPathResource resource = new ClassPathResource("static/run_as_admin.bat");
+            File batFile = resource.getFile();
+            Process process = Runtime.getRuntime().exec("cmd /c start " + batFile.getAbsolutePath());
             try {
-                ProcessBuilder processBuilder = new ProcessBuilder("cmd", "/c", batFilePath);
-                processBuilder.inheritIO(); // 这将允许看到命令行输出
-                Process process = processBuilder.start();
-
-                int exitCode = process.waitFor();
-                System.out.println("Bat file executed, exit code: " + exitCode);
-
-                try{
-                    // 获取项目根路径
-                    sleep(3000);
-                    String rootPath = System.getProperty("user.dir");
-                    System.out.println(rootPath);
-                    String inputFilePath = Paths.get(rootPath, "yxlmpeizhi.txt").toString();
-                    String outputFilePath = Paths.get(rootPath, "tokenAndPort.txt").toString();
-
-                    // 读取文件内容
-                    String content = readFile(inputFilePath);
-                    System.out.println("File content: " + content);
+                sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            InputStream inputStream2 = getClass().getClassLoader().getResourceAsStream("classpath:yxlmpeizhi.txt");
+                    ClassPathResource resource2 = new ClassPathResource("static/run_as_admin.bat");
                     // 提取 token 和 port
-                    String token = extractInfo(content, "--remoting-auth-token=([^\"\\s]+)");
-                    String port = extractInfo(content, "--app-port=(\\d+)");
+                    String token = extractInfo("11", "--remoting-auth-token=([^\"\\s]+)");
+                    String port = extractInfo("content", "--app-port=(\\d+)");
                     System.out.println("Token: " + token);
                     // 保存提取的信息到新文件
-                    saveInfo(outputFilePath, token, port);
+                    saveInfo( token, port);
 
-                    System.out.println("信息已提取并保存到 " + outputFilePath);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
         }
         private String readFile(String filePath) throws IOException {
             StringBuilder content = new StringBuilder();
@@ -68,47 +53,28 @@ public class GetTokenAndPort {
             return matcher.find() ? matcher.group(1) : "Not found";
         }
 
-        private void saveInfo(String filePath, String token, String port) throws IOException {
-//            File file = new File(filePath);
-//
-//            // 如果文件存在，删除它
-//            if (file.exists()) {
-//                if (!file.delete()) {
-//                    System.out.println("Unable to delete existing file: " + filePath);
+        private void saveInfo(String token, String port) throws IOException {
+
+               ClassPathResource resource = new ClassPathResource("static/tokenAndPort.json");
+               Path tempFile = Files.createTempFile("tokenAndPort", ".json");
+                Files.copy(resource.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+                File file = new File(tempFile.toString());
+                try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+                    writer.println("{\"Token\":\"" + token + "\",\"Port\":\"" + port + "\"}");
+                }
+//            if (file1.exists()) {
+//                if (!file1.delete()) {
+//                    System.out.println("Unable to delete existing file: " + file1.getAbsolutePath());
 //                    return;
 //                }
 //            }
-//
-//            // 创建新文件
-//            if (!file.createNewFile()) {
-//                System.out.println("Unable to create new file: " + filePath);
+//            if (!file1.createNewFile()) {
+//                System.out.println("Unable to create new file: " + file1.getAbsolutePath());
 //                return;
 //            }
-//
-//            // 写入新内容
-//            try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-//                writer.println("Token: " + token);
-//                writer.println("Port: " + port);
+//            try (PrintWriter writer = new PrintWriter(new FileWriter(file1))) {
+//                writer.println("{\"Token\":\"" + token + "\",\"Port\":\"" + port + "\"}");
 //            }
-//
-//            System.out.println("File created and information saved to: " + filePath);
-            //把上面的内容改存到static中的tokenAndPort.json,如果文件存在，删除它重新创建
-            String rootPath = System.getProperty("user.dir");
-            String outputFilePath = Paths.get(rootPath, "src/main/resources/static/tokenAndPort.json").toString();
-            File file1 = new File(outputFilePath);
-            if (file1.exists()) {
-                if (!file1.delete()) {
-                    System.out.println("Unable to delete existing file: " + outputFilePath);
-                    return;
-                }
-            }
-            if (!file1.createNewFile()) {
-                System.out.println("Unable to create new file: " + outputFilePath);
-                return;
-            }
-            try (PrintWriter writer = new PrintWriter(new FileWriter(file1))) {
-                writer.println("{\"Token\":\"" + token + "\",\"Port\":\"" + port + "\"}");
-            }
         }
 
 }
