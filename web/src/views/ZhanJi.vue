@@ -4,11 +4,8 @@ import {ElMessage} from "element-plus";
 
 const getCurrent = () => {
   $.ajax({
-    url: "http://localhost:8089/StartWebSocketApi",
+    url: "http://localhost:8089/getCurrentGameSummonersId",
     type: "GET",
-    data: {
-      message:"[6, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"
-    },
     success(resp) {
       console.log(resp);
     },

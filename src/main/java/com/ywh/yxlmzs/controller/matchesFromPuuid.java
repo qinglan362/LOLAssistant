@@ -37,7 +37,7 @@ public class matchesFromPuuid {
     GetGameFromGameId getGameFromGameId;
 
     @GetMapping("/matchesFromPuuid")
-    public Object MatchesFromPuuid(@RequestParam Map<String, Object> map) throws JsonProcessingException {
+    public Object MatchesFromPuuid(@RequestParam Map<String, Object> map) throws IOException {
         List<Champion> champions = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
@@ -62,6 +62,7 @@ public class matchesFromPuuid {
         String Token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
         String Port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
         JsonNode games= objectMapper.readTree(callApi.callApiGet(url, Token, Port, null)).get("games").get("games");
+
         List<String> gameIds= new ArrayList<>();
         Map<String, String> gameDate = new HashMap<>();
         Map<String,String> gameMode=new HashMap<>();

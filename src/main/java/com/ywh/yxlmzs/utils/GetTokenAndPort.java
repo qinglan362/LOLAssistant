@@ -69,29 +69,46 @@ public class GetTokenAndPort {
         }
 
         private void saveInfo(String filePath, String token, String port) throws IOException {
-            File file = new File(filePath);
-
-            // 如果文件存在，删除它
-            if (file.exists()) {
-                if (!file.delete()) {
-                    System.out.println("Unable to delete existing file: " + filePath);
+//            File file = new File(filePath);
+//
+//            // 如果文件存在，删除它
+//            if (file.exists()) {
+//                if (!file.delete()) {
+//                    System.out.println("Unable to delete existing file: " + filePath);
+//                    return;
+//                }
+//            }
+//
+//            // 创建新文件
+//            if (!file.createNewFile()) {
+//                System.out.println("Unable to create new file: " + filePath);
+//                return;
+//            }
+//
+//            // 写入新内容
+//            try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+//                writer.println("Token: " + token);
+//                writer.println("Port: " + port);
+//            }
+//
+//            System.out.println("File created and information saved to: " + filePath);
+            //把上面的内容改存到static中的tokenAndPort.json,如果文件存在，删除它重新创建
+            String rootPath = System.getProperty("user.dir");
+            String outputFilePath = Paths.get(rootPath, "src/main/resources/static/tokenAndPort.json").toString();
+            File file1 = new File(outputFilePath);
+            if (file1.exists()) {
+                if (!file1.delete()) {
+                    System.out.println("Unable to delete existing file: " + outputFilePath);
                     return;
                 }
             }
-
-            // 创建新文件
-            if (!file.createNewFile()) {
-                System.out.println("Unable to create new file: " + filePath);
+            if (!file1.createNewFile()) {
+                System.out.println("Unable to create new file: " + outputFilePath);
                 return;
             }
-
-            // 写入新内容
-            try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-                writer.println("Token: " + token);
-                writer.println("Port: " + port);
+            try (PrintWriter writer = new PrintWriter(new FileWriter(file1))) {
+                writer.println("{\"Token\":\"" + token + "\",\"Port\":\"" + port + "\"}");
             }
-
-            System.out.println("File created and information saved to: " + filePath);
         }
 
 }

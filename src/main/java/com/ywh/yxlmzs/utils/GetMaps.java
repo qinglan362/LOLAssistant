@@ -65,6 +65,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -81,7 +82,7 @@ public class GetMaps {
     @Resource
     ObjectMapper objectMapper;
 
-    public void getMaps() {
+    public void getMaps() throws IOException {
         //String projectRoot = System.getProperty("user.dir");
         String url = "/lol-game-queues/v1/queues";
         String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
