@@ -4,8 +4,6 @@ import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 import java.util.Map;
 
 @Service
@@ -17,7 +15,7 @@ public class GetSummoners {
     @Resource
     GetGlobalTokenAndPort getGlobalTokenAndPort;
 
-    public String getSummoners(Map<String,Object> map) throws IOException {
+    public String getSummoners(Map<String,Object> map){
         String port=getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
         String token=getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
         String url="/lol-summoner/v1/summoners";

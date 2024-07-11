@@ -6,7 +6,6 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -19,7 +18,7 @@ public class CreateFiveXunLian {
 
 
    @PostMapping("/createFiveXunLian")
-   public String createFiveXunLian() throws IOException {
+   public String createFiveXunLian() {
     String url = "/lol-lobby/v2/lobby";
     String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
     String port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");

@@ -17,7 +17,7 @@ public class GetEventHelp {
     CallApi callApi;
     @Resource
     GetGlobalTokenAndPort getGlobalTokenAndPort;
-    public void getEventHelp() throws IOException {
+    public void getEventHelp() {
         String port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
         String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
         String url = "/help";

@@ -16,17 +16,20 @@ public class WatcClient {
 
     @GetMapping("/StartWebSocketApi")
     public String startWatching(@RequestParam String message) throws Exception {
+      //  String subscribeMessage = "[5, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]";
         System.out.println("subscribeMessage: " + message);
         webSocketRegistrationService.getClientWebSocket().subscribe(message);
-        return "Started watching " + message;
+      return "Started watching " + message;
     }
     @GetMapping("/StopWebSocketApi")
     public String stopWatching (@RequestParam String message) throws Exception {
+        System.out.println("unsubscribeMessage: " + message);
+    //    String unsubscribeMessage = "[6, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]";
         try {
             webSocketRegistrationService.getClientWebSocket().unsubscribe(message);
             return "Stopped watching " + message;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-    }
+        }
 }

@@ -2,7 +2,6 @@ package com.ywh.yxlmzs.service;
 
 import com.ywh.yxlmzs.WebSocket.ClientWebSocket;
 import com.ywh.yxlmzs.utils.WebSocketSSL;
-import lombok.Getter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
@@ -10,7 +9,6 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import javax.net.ssl.SSLContext;
 import java.util.Base64;
 
-@Getter
 @Service
 public class WebSocketRegistrationService {
 
@@ -36,4 +34,7 @@ public class WebSocketRegistrationService {
         manager.start();
     }
 
+    public ClientWebSocket getClientWebSocket() {
+        return clientWebSocket;
+    }
 }
