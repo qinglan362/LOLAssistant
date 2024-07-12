@@ -14,8 +14,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -37,12 +41,12 @@ public class matchesFromPuuid {
     GetGameFromGameId getGameFromGameId;
 
     @GetMapping("/matchesFromPuuid")
-    public Object MatchesFromPuuid(@RequestParam Map<String, Object> map) throws JsonProcessingException {
+    public Object MatchesFromPuuid(@RequestParam Map<String, Object> map) throws IOException {
         List<Champion> champions = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            InputStream inputStream = new ClassPathResource("static/champion.json").getInputStream();
-            JsonNode rootNode = objectMapper.readTree(inputStream);
+            Path filePath = Paths.get("src/main/resources/static/champion.json");
+            JsonNode rootNode = objectMapper.readTree(filePath.toFile());
             JsonNode dataNode = rootNode.get("data");
             dataNode.fieldNames().forEachRemaining(name -> {
                 JsonNode championNode = dataNode.get(name);

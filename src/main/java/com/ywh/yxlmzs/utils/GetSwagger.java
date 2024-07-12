@@ -3,6 +3,8 @@ package com.ywh.yxlmzs.utils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 @Service
 public class GetSwagger {
 
@@ -11,14 +13,14 @@ public class GetSwagger {
             @Resource
             GetGlobalTokenAndPort getGlobalTokenAndPort;
 
-        public void getSwagger() {
+        public void getSwagger() throws IOException {
             String port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
             String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
             String url = "/swagger/v2/swagger.json";
             System.out.println( callApi.callApiGet(url, token, port, null));
         }
 
-        public void getOpenApi() {
+        public void getOpenApi() throws IOException {
             String port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
             String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
             String url = "/swagger/v3/openapi.json";

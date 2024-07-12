@@ -16,21 +16,21 @@ const create55xunlian=()=>{
     }
   });
 }
-const  zdjsdj= () =>{
-  let status=ref('')
-  let url=ref('')
-  if (store.state.isAutoAccept===true){
-      status.value='StopWebSocketApi'
-      url.value="[6, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]"
-  }else{
-      status.value='StartWebSocketApi'
-       url.value="[5, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]"
+const  zdjsdj= () => {
+  let status = ref('')
+  let url = ref('')
+  if (store.state.isAutoAccept === true) {
+    status.value = 'StopWebSocketApi'
+    url.value = "[6, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]"
+  } else {
+    status.value = 'StartWebSocketApi'
+    url.value = "[5, \"OnJsonApiEvent_lol-lobby_v2_lobby\"]"
   }
   $.ajax({
-    url:  `http://localhost:8089/${encodeURIComponent(status.value)}`,
+    url: `http://localhost:8089/${encodeURIComponent(status.value)}`,
     type: "Get",
-    data:{
-      message:url.value
+    data: {
+      message: url.value
     },
     success(resp) {
       console.log(resp)
@@ -40,15 +40,15 @@ const  zdjsdj= () =>{
       ElMessage.error(resp.msg);
     }
   });
-  store.state.isAutoAccept=!store.state.isAutoAccept
+  store.state.isAutoAccept = !store.state.isAutoAccept
 }
-const backdrop=ref('')
-const getBackgrop=()=>{
+const backdrop = ref('')
+const getBackgrop = () => {
   $.ajax({
     url: "http://localhost:8089/getBackdrop",
     type: "Get",
-    data:{
-      name:backdrop.value
+    data: {
+      name: backdrop.value
     },
     success(resp) {
       window.open(resp)
@@ -64,11 +64,11 @@ const getBackgrop=()=>{
 
 <template>
 
-    <el-button type="primary" @click="create55xunlian">创建55训练模式</el-button>
-    <el-button v-if="!store.state.isAutoAccept" type="success" @click="zdjsdj">开启自动接受对局</el-button>
-     <el-button v-else type="danger" @click="zdjsdj">取消自动接受对局</el-button>
-   <el-input style="width: 200px;margin-left: 30px" v-model="backdrop" placeholder="格式为:xxxx#xxxx"></el-input>
-    <el-button type="primary" @click="getBackgrop">下载某人的生涯背景</el-button>
+  <el-button type="primary" @click="create55xunlian">创建55训练模式</el-button>
+  <el-button v-if="!store.state.isAutoAccept" type="success" @click="zdjsdj">开启自动接受对局</el-button>
+  <el-button v-else type="danger" @click="zdjsdj">取消自动接受对局</el-button>
+  <el-input style="width: 200px;margin-left: 30px" v-model="backdrop" placeholder="格式为:xxxx#xxxx"></el-input>
+  <el-button type="primary" @click="getBackgrop">下载某人的生涯背景</el-button>
 
 </template>
 

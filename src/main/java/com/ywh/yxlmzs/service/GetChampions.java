@@ -1,5 +1,8 @@
 package com.ywh.yxlmzs.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Resource;
 import kong.unirest.JsonResponse;
 import kong.unirest.Unirest;
 import org.springframework.stereotype.Service;
@@ -8,18 +11,15 @@ import java.io.*;
 @Service
 public class GetChampions {
 
-    public void getChampions() {
-        String versionFilePath = System.getProperty("user.dir") + "/version.txt";
-        StringBuilder versionContent = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(versionFilePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                versionContent.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        String version = versionContent.toString().trim();
+
+        @Resource
+        ObjectMapper objectMapper;
+
+        public void getChampions() throws IOException {
+            String versionFilePath = System.getProperty("user.dir") + "/src/main/resources/static/versions.json";
+            File file = new File(versionFilePath);
+            JsonNode versionNode = objectMapper.readTree(file);
+            String version = versionNode.get("version").asText();
         String projectRoot = System.getProperty("user.dir");
         JsonResponse response = (JsonResponse) Unirest.get("http://ddragon.leagueoflegends.com/cdn/"+version+"/data/zh_CN/champion.json")
                     .asJson();
