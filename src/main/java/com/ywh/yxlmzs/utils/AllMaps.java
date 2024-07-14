@@ -1,13 +1,15 @@
 package com.ywh.yxlmzs.utils;
 
+import com.ywh.yxlmzs.entity.mapsInfo;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
-@Setter
-@Getter
+import java.util.List;
+
 @Component
-public class GetGlobalTokenAndPort {
-    private String token;
-    private  String port;
+@Getter
+@Setter
+public class AllMaps {
+    private List<mapsInfo> list;
 }

@@ -1,16 +1,25 @@
 package com.ywh.yxlmzs.WebSocket;
 
 import com.ywh.yxlmzs.utils.CallApi;
+
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
-import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-
+@Component
 public class ClientWebSocket extends TextWebSocketHandler {
 
-   private WebSocketSession session;
+    private WebSocketSession session;
+
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+
+    @Autowired
+    public ClientWebSocket(GetGlobalTokenAndPort getGlobalTokenAndPort) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -21,13 +30,11 @@ public class ClientWebSocket extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 
         CallApi callApi=new CallApi();
-        GetGlobalTokenAndPort getGlobalTokenAndPort=new GetGlobalTokenAndPort();
-
+        String  port=getGlobalTokenAndPort.getPort();
+        String  token=getGlobalTokenAndPort.getToken();
         if (message.getPayload().contains("OnJsonApiEvent_lol-lobby_v2_lobby")){
             if (message.getPayload().contains("Found")) {
                 String Url= "/lol-matchmaking/v1/ready-check/accept";
-                String  port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
-                String  token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
                 callApi.callApiPost(Url,token,port,null);
             }
             if (message.getPayload().contains("Searching")){

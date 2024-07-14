@@ -3,6 +3,7 @@ package com.ywh.yxlmzs.controller;
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,8 +13,13 @@ import java.util.Map;
 @RestController
 public class CreateFiveXunLian {
 
-    @Resource
-    GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private  GetGlobalTokenAndPort getGlobalTokenAndPort;
+
+    @Autowired
+    public CreateFiveXunLian(GetGlobalTokenAndPort getGlobalTokenAndPort) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+    }
+
     @Resource
     CallApi callApi;
 
@@ -21,8 +27,8 @@ public class CreateFiveXunLian {
    @PostMapping("/createFiveXunLian")
    public String createFiveXunLian() throws IOException {
     String url = "/lol-lobby/v2/lobby";
-    String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
-    String port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
+    String token = getGlobalTokenAndPort.getToken();
+    String port = getGlobalTokenAndPort.getPort();
        System.out.println(11);
     Map<String, Object> map = Map.of(
             "customGameLobby", Map.of(

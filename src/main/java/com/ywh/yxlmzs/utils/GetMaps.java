@@ -59,6 +59,8 @@ package com.ywh.yxlmzs.utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.mapsInfo;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -77,28 +79,28 @@ public class GetMaps {
 
     @Resource
     CallApi callApi;
-    @Resource
-    GetGlobalTokenAndPort getGlobalTokenAndPort;
+//    @Resource
+//    GetGlobalTokenAndPort getGlobalTokenAndPort;
     @Resource
     ObjectMapper objectMapper;
 
+    private AllMaps allMaps;
+
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+
+    @Autowired
+    public GetMaps(GetGlobalTokenAndPort getGlobalTokenAndPort, AllMaps allMaps) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+        this.allMaps = allMaps;
+    }
+
     public void getMaps() throws IOException {
-        //String projectRoot = System.getProperty("user.dir");
         String url = "/lol-game-queues/v1/queues";
-        String token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
-        String port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
+        String token = getGlobalTokenAndPort.getToken();
+        String port = getGlobalTokenAndPort.getPort();
         String Maps = callApi.callApiGet(url, token, port, null);
         try {
             JsonNode rootNode = objectMapper.readTree(Maps);
-            Path filePath = Paths.get("src/main/resources/static/maps.json");
-            File file = filePath.toFile();
-
-            // 如果文件存在，删除它
-            if (file.exists()) {
-                Files.delete(filePath);
-            }
-
-            // 创建新的文件并写入数据
             List<mapsInfo> mapInfoList = new ArrayList<>();
             for (JsonNode node : rootNode) {
                 String availability = node.get("queueAvailability").asText();
@@ -111,10 +113,8 @@ public class GetMaps {
                     mapInfoList.add(mapInfo);
                 }
             }
-
-            // 将对象列表写入JSON文件
-            objectMapper.writeValue(file, mapInfoList);
-            System.out.println("maps.json文件已生成");
+            allMaps.setList(mapInfoList);
+            System.out.println("allmaps全局对象已更新");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -20,13 +20,17 @@ public class StartupRunner implements CommandLineRunner {
     GetVersion getVersion;
     @Resource
     GetChampions getChampions;
-    @Resource
-    GetEventHelp getEventHelp;
-    @Resource
-    GetGlobalTokenAndPort getGlobalTokenAndPort;
+
+
     @Resource
     WebSocketRegistrationService webSocketRegistrationService;
 
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+
+    @Autowired
+    public StartupRunner(GetGlobalTokenAndPort getGlobalTokenAndPort) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+    }
 
     @Override
     public void run(String... args) throws Exception {
@@ -35,13 +39,12 @@ public class StartupRunner implements CommandLineRunner {
         getMaps.getMaps();
         getVersion.getVersions();
         getChampions.getChampions();
-        getEventHelp.getEventHelp();
         startWebsocket();
     }
 
     public void startWebsocket() throws Exception {
-        String  port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
-        String  token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
+        String  port = getGlobalTokenAndPort.getPort();
+        String  token = getGlobalTokenAndPort.getToken();
         String url = "wss://127.0.0.1:"+port+"/";
         webSocketRegistrationService.registerWebSocketHandler(url, "riot", token);
     }

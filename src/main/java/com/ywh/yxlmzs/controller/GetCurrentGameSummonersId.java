@@ -7,9 +7,12 @@ import com.ywh.yxlmzs.entity.Champion;
 import com.ywh.yxlmzs.entity.MatchRecord;
 import com.ywh.yxlmzs.service.GetGameFromGameId;
 import com.ywh.yxlmzs.service.GetSummoners;
+import com.ywh.yxlmzs.utils.AllChampions;
+import com.ywh.yxlmzs.utils.AllMaps;
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,22 +31,25 @@ public class GetCurrentGameSummonersId {
     @Resource
     CallApi callApi;
     @Resource
-    GetGlobalTokenAndPort getGlobalTokenAndPort;
-    @Resource
-    GetSummoners getSummoners;
-    @Resource
     ObjectMapper objectMapper;
     @Resource
     GetGameFromGameId getGameFromGameId;
 
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private AllChampions allChampions;
+    private AllMaps allMaps;
+    @Autowired
+    public GetCurrentGameSummonersId(GetGlobalTokenAndPort getGlobalTokenAndPort, AllChampions allChampions, AllMaps allMaps) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+        this.allChampions = allChampions;
+        this.allMaps = allMaps;
+    }
     @GetMapping("/getCurrentGameSummonersId")
     public Object getCurrentGameSummonersId() throws IOException {
-
         List<String> puuids=new ArrayList<>();
-
         String url="/lol-champ-select/v1/session";
-        String port=getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
-        String token=getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
+        String port=getGlobalTokenAndPort.getPort();
+        String token=getGlobalTokenAndPort.getToken();
         String result=callApi.callApiGet(url,token,port,null);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode rootNode = objectMapper.readTree(result);
@@ -57,33 +63,17 @@ public class GetCurrentGameSummonersId {
             }
         }
 
-        List<Champion> champions = new ArrayList<>();
-        try {
-            InputStream inputStream = new ClassPathResource("static/champion.json").getInputStream();
-            JsonNode rootNode1 = objectMapper.readTree(inputStream);
-            JsonNode dataNode = rootNode1.get("data");
-            dataNode.fieldNames().forEachRemaining(name -> {
-                JsonNode championNode = dataNode.get(name);
-                Champion champion = new Champion();
-                champion.setName(championNode.get("name").asText());
-                champion.setChampionId(championNode.get("key").asInt());
-                champions.add(champion);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        List<Champion> champions = allChampions.getList();
 
         List<List<MatchRecord>> AllMyTeamMatchRecords = new ArrayList<>();
 
         for (String puuid : puuids) {
             List<MatchRecord> OneMyTeamPlayerMatchRecords = new ArrayList<>();
             String matchUrl = "/lol-match-history/v1/products/lol/" + puuid + "/matches";
-            String Token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
-            String Port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
             Map<String, Object> params = new HashMap<>();
             params.put("begIndex", "0");
             params.put("endIndex", "4");
-            JsonNode games = objectMapper.readTree(callApi.callApiGet(matchUrl, Token, Port, params)).get("games").get("games");
+            JsonNode games = objectMapper.readTree(callApi.callApiGet(matchUrl, token, port, params)).get("games").get("games");
 
             List<String> gameIds= new ArrayList<>();
             Map<String, String> gameDate = new HashMap<>();
@@ -115,7 +105,7 @@ public class GetCurrentGameSummonersId {
                             matchRecord.setMapName(gameMode.get(gameId));
                             Integer championId = participants.get(i).get(j).get("championId").asInt();
                             champions.stream()
-                                    .filter(c -> c.getChampionId().equals(championId))
+                                    .filter(c -> c.getKey().equals(championId))
                                     .findFirst().ifPresent(champion -> matchRecord.setChampionName(champion.getName()));
                             OneMyTeamPlayerMatchRecords.add(matchRecord);
                         }
@@ -136,17 +126,13 @@ public class GetCurrentGameSummonersId {
     }
 
     public Map<String,String>  getMapNameById() {
+
         Map<String, String> maps = new HashMap<>();
-        try {
-            InputStream inputStream = new ClassPathResource("static/maps.json").getInputStream();
-            JsonNode rootNode = objectMapper.readTree(inputStream);
-            for (JsonNode node : rootNode) {
-                String id = node.get("id").asText();
-                String name = node.get("name").asText();
-                maps.put(id, name);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        for (int i=0;i<allMaps.getList().size();i++){
+            String id= allMaps.getList().get(i).getId();
+            String name= allMaps.getList().get(i).getName();
+            maps.put(id,name);
         }
         return maps;
     }

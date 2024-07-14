@@ -7,9 +7,12 @@ import com.ywh.yxlmzs.entity.Champion;
 import com.ywh.yxlmzs.entity.MatchRecord;
 import com.ywh.yxlmzs.service.GetGameFromGameId;
 import com.ywh.yxlmzs.service.GetSummoners;
+import com.ywh.yxlmzs.utils.AllChampions;
+import com.ywh.yxlmzs.utils.AllMaps;
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,39 +35,31 @@ public class matchesFromPuuid {
     @Resource
     CallApi callApi;
     @Resource
-    GetGlobalTokenAndPort getGlobalTokenAndPort;
-    @Resource
     GetSummoners getSummoners;
     @Resource
     ObjectMapper objectMapper;
     @Resource
     GetGameFromGameId getGameFromGameId;
 
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private AllChampions allChampions;
+    private AllMaps allMaps;
+    @Autowired
+    public matchesFromPuuid(GetGlobalTokenAndPort getGlobalTokenAndPort, AllChampions allChampions, AllMaps allMaps) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+        this.allChampions = allChampions;
+        this.allMaps = allMaps;
+    }
+
     @GetMapping("/matchesFromPuuid")
     public Object MatchesFromPuuid(@RequestParam Map<String, Object> map) throws IOException {
-        List<Champion> champions = new ArrayList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            Path filePath = Paths.get("src/main/resources/static/champion.json");
-            JsonNode rootNode = objectMapper.readTree(filePath.toFile());
-            JsonNode dataNode = rootNode.get("data");
-            dataNode.fieldNames().forEachRemaining(name -> {
-                JsonNode championNode = dataNode.get(name);
-                Champion champion = new Champion();
-                champion.setName(championNode.get("name").asText());
-                champion.setChampionId(championNode.get("key").asInt());
-                champions.add(champion);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        List<Champion> champions = allChampions.getList();
         String response = getSummoners.getSummoners(map);
         JsonNode rootNode = objectMapper.readTree(response);
         String puuId =rootNode.get("puuid").asText();
         String url = "/lol-match-history/v1/products/lol/"+puuId+"/matches";
-        String Token = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Token");
-        String Port = getGlobalTokenAndPort.GlobalTokenAndPortSet().get("Port");
+        String Token = getGlobalTokenAndPort.getToken();
+        String Port = getGlobalTokenAndPort.getPort();
         JsonNode games= objectMapper.readTree(callApi.callApiGet(url, Token, Port, null)).get("games").get("games");
         List<String> gameIds= new ArrayList<>();
         Map<String, String> gameDate = new HashMap<>();
@@ -97,7 +92,7 @@ public class matchesFromPuuid {
                     matchRecord.setMapName(gameMode.get(gameId));
                     Integer championId = participants.get(i).get(j).get("championId").asInt();
                     champions.stream()
-                            .filter(c -> c.getChampionId().equals(championId))
+                            .filter(c -> c.getKey().equals(championId))
                             .findFirst().ifPresent(champion -> matchRecord.setChampionName(champion.getName()));
                     matchRecords.add(matchRecord);
                 }
@@ -117,16 +112,10 @@ public class matchesFromPuuid {
 
     public Map<String,String>  getMapNameById() {
         Map<String, String> maps = new HashMap<>();
-        try {
-            InputStream inputStream = new ClassPathResource("static/maps.json").getInputStream();
-            JsonNode rootNode = objectMapper.readTree(inputStream);
-            for (JsonNode node : rootNode) {
-                String id = node.get("id").asText();
-                String name = node.get("name").asText();
-                maps.put(id, name);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (int i=0;i<allMaps.getList().size();i++){
+              String id= allMaps.getList().get(i).getId();
+               String name= allMaps.getList().get(i).getName();
+                maps.put(id,name);
         }
         return maps;
     }

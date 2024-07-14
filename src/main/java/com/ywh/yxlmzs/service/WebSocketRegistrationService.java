@@ -1,7 +1,9 @@
 package com.ywh.yxlmzs.service;
 
 import com.ywh.yxlmzs.WebSocket.ClientWebSocket;
+import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import com.ywh.yxlmzs.utils.WebSocketSSL;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
@@ -12,15 +14,21 @@ import java.util.Base64;
 @Service
 public class WebSocketRegistrationService {
 
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+
+    @Autowired
+    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort) {
+        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+    }
+
     private ClientWebSocket clientWebSocket;
 
     public void registerWebSocketHandler(String path, String username, String password) throws Exception {
         SSLContext sslContext = WebSocketSSL.createTrustAllSSLContext();
 
-        // 创建WebSocket客户端并设置SSLContext
         StandardWebSocketClient client = new StandardWebSocketClient();
         client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
-        clientWebSocket = new ClientWebSocket();
+        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort);
         WebSocketConnectionManager manager = new WebSocketConnectionManager(client, clientWebSocket, path);
 
         // 添加Basic Auth认证信息到Header中
