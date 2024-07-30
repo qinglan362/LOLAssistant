@@ -60,17 +60,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.mapsInfo;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,8 +72,7 @@ public class GetMaps {
 
     @Resource
     CallApi callApi;
-//    @Resource
-//    GetGlobalTokenAndPort getGlobalTokenAndPort;
+
     @Resource
     ObjectMapper objectMapper;
 
@@ -114,7 +106,6 @@ public class GetMaps {
                 }
             }
             allMaps.setList(mapInfoList);
-            System.out.println("allmaps全局对象已更新");
         } catch (Exception e) {
             e.printStackTrace();
         }

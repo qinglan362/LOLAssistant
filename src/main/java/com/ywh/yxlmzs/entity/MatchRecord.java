@@ -18,4 +18,5 @@ public class MatchRecord {
     private  String championName;
     private String date;
     private String mapName;
+    private Rank rank;
 }

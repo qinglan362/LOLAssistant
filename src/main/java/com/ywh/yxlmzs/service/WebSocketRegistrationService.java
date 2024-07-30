@@ -2,7 +2,9 @@ package com.ywh.yxlmzs.service;
 
 import com.ywh.yxlmzs.WebSocket.ClientWebSocket;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
+import com.ywh.yxlmzs.utils.PickChampionId;
 import com.ywh.yxlmzs.utils.WebSocketSSL;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -15,12 +17,15 @@ import java.util.Base64;
 public class WebSocketRegistrationService {
 
     private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private PickChampionId pickChampionId;
 
     @Autowired
-    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort) {
+    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+        this.pickChampionId=pickChampionId;
     }
 
+    @Getter
     private ClientWebSocket clientWebSocket;
 
     public void registerWebSocketHandler(String path, String username, String password) throws Exception {
@@ -28,7 +33,7 @@ public class WebSocketRegistrationService {
 
         StandardWebSocketClient client = new StandardWebSocketClient();
         client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
-        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort);
+        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId);
         WebSocketConnectionManager manager = new WebSocketConnectionManager(client, clientWebSocket, path);
 
         // 添加Basic Auth认证信息到Header中
@@ -42,7 +47,4 @@ public class WebSocketRegistrationService {
         manager.start();
     }
 
-    public ClientWebSocket getClientWebSocket() {
-        return clientWebSocket;
-    }
 }

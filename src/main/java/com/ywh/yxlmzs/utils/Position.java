@@ -4,9 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
+@Component
 @Getter
 @Setter
-@Component
-public class Version {
-    private  String version;
+public class Position {
+   private  Map<String, String> position;
 }

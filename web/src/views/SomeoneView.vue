@@ -98,34 +98,101 @@ const getOneMatch = (row) => {
     <el-col :span="16">
       <el-table :data="tableData2Win"
                 row-style="background-color:rgb(221,242,245)"
-                style="width: 100%"
       >
-        <el-table-column label="游戏昵称" width="180">
+        <el-table-column label="游戏昵称" width="170">
           <template #default="scope">
             <el-link @click="handleGameNameClick(scope.row.gameName)">{{ scope.row.gameName }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="championName" label="角色名称" width="180"/>
-        <el-table-column prop="champLevel" label="角色等级" width="180"/>
-        <el-table-column prop="kills" label="击杀数" width="180"/>
-        <el-table-column prop="deaths" label="死亡数" width="180"/>
-        <el-table-column prop="assists" label="助攻数" width="180"/>
+        <el-table-column prop="championName" label="角色名称" width="100"/>
+        <el-table-column prop="champLevel" label="角色等级" width="80"/>
+        <el-table-column prop="kills" label="击杀数" width="70"/>
+        <el-table-column prop="deaths" label="死亡数" width="70"/>
+        <el-table-column prop="assists" label="助攻数" width="70"/>
+        <el-table-column   label="单双排" width="350">
+          <el-table-column  label="当前赛季最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_SOLO_5x5_CurrentSeason_HighestTier+scope.row.rank.ranked_SOLO_5x5_CurrentSeason_HighestDivision}}
+            </template>
+          </el-table-column>
+          <el-table-column  label="当前段位" width="130">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_SOLO_5x5_CurrentSeason_Tier+scope.row.rank.ranked_SOLO_5x5_CurrentSeason_Division+"  "+scope.row.rank.ranked_SOLO_5x5_CurrentSeason_LeaguePoints}}
+            </template>
+          </el-table-column>
+          <el-table-column label="历史最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_SOLO_5x5_PreviousSeasonHighestTier}}
+            </template>
+          </el-table-column>
+        </el-table-column>
+        <el-table-column label="灵活组排" width="350">
+          <el-table-column  label="当前赛季最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_FLEX_SR_CurrentSeason_HighestTier+scope.row.rank.ranked_FLEX_SR_CurrentSeason_HighestDivision}}
+            </template>
+          </el-table-column>
+          <el-table-column  label="当前段位" width="130">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_FLEX_SR_CurrentSeason_Tier+scope.row.rank.ranked_FLEX_SR_CurrentSeason_Division+"  "+scope.row.rank.ranked_FLEX_SR_CurrentSeason_LeaguePoints}}
+            </template>
+          </el-table-column>
+          <el-table-column label="历史最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_FLEX_SR_PreviousSeasonHighestTier}}
+            </template>
+          </el-table-column>
+        </el-table-column>
       </el-table>
 
       <el-table :data="tableData2False"
                 row-style="background-color:rgb(252,241,241)"
-                style="width: 100%;
+                style="
                  margin-top: 50px">
         <el-table-column label="游戏昵称" width="180">
           <template #default="scope">
             <el-link @click="handleGameNameClick(scope.row.gameName)">{{ scope.row.gameName }}</el-link>
           </template>
         </el-table-column>
-        <el-table-column prop="championName" label="角色名称" width="180"/>
-        <el-table-column prop="champLevel" label="角色等级" width="180"/>
-        <el-table-column prop="kills" label="击杀数" width="180"/>
-        <el-table-column prop="deaths" label="死亡数" width="180"/>
-        <el-table-column prop="assists" label="助攻数" width="180"/>
+        <el-table-column prop="championName" label="角色名称" width="100"/>
+        <el-table-column prop="champLevel" label="角色等级" width="80"/>
+        <el-table-column prop="kills" label="击杀数" width="70"/>
+        <el-table-column prop="deaths" label="死亡数" width="70"/>
+        <el-table-column prop="assists" label="助攻数" width="70"/>
+        <el-table-column   label="单双排" width="350">
+          <el-table-column  label="当前赛季最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_SOLO_5x5_CurrentSeason_HighestTier+scope.row.rank.ranked_SOLO_5x5_CurrentSeason_HighestDivision}}
+            </template>
+          </el-table-column>
+          <el-table-column  label="当前段位" width="130">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_SOLO_5x5_CurrentSeason_Tier+scope.row.rank.ranked_SOLO_5x5_CurrentSeason_Division+"  "+scope.row.rank.ranked_SOLO_5x5_CurrentSeason_LeaguePoints}}
+            </template>
+          </el-table-column>
+          <el-table-column label="历史最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_SOLO_5x5_PreviousSeasonHighestTier}}
+            </template>
+          </el-table-column>
+        </el-table-column>
+        <el-table-column label="灵活组排" width="350">
+          <el-table-column  label="当前赛季最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_FLEX_SR_CurrentSeason_HighestTier+scope.row.rank.ranked_FLEX_SR_CurrentSeason_HighestDivision}}
+            </template>
+          </el-table-column>
+          <el-table-column  label="当前段位" width="130">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_FLEX_SR_CurrentSeason_Tier+scope.row.rank.ranked_FLEX_SR_CurrentSeason_Division+"  "+scope.row.rank.ranked_FLEX_SR_CurrentSeason_LeaguePoints}}
+            </template>
+          </el-table-column>
+          <el-table-column label="历史最高段位" width="110">
+            <template v-slot="scope">
+              {{ scope.row.rank.ranked_FLEX_SR_PreviousSeasonHighestTier}}
+            </template>
+          </el-table-column>
+        </el-table-column>
       </el-table>
     </el-col>
   </el-row>
