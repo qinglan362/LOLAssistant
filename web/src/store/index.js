@@ -6,11 +6,13 @@ export default createStore({
     isAutoAccept: false,
     champions: [],
     championId: -1,
+    banChampionId: -1,
   },
   getters: {
     getIsAutoAccept: state => state.isAutoAccept,
     getCurrentChampion: state => state.championId,
-    getChampions: state => state.champions
+    getChampions: state => state.champions,
+    getBanChampion: state => state.banChampionId,
   },
   mutations: {
     setSsAutoAccept(state, value) {
@@ -21,6 +23,9 @@ export default createStore({
     },
     setCurrentChampion(state, championId) {
       state.championId = championId
+    },
+    setBanChampion(state, championId) {
+      state.banChampionId = championId
     }
   },
   actions: {
@@ -32,7 +37,10 @@ export default createStore({
     },
     updateCurrentChampion({ commit }, championId) {
       commit('setCurrentChampion', championId);
-    }
+    },
+    updateBanChampion({ commit }, championId) {
+      commit('setBanChampion', championId);
+    },
   },
   modules: {
     user:ModuleUser,

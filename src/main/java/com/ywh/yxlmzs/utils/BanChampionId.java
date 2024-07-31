@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @AllArgsConstructor
 @Component
-public class PickChampionId {
+public class BanChampionId {
     private Integer championId;
     private String state;
 }

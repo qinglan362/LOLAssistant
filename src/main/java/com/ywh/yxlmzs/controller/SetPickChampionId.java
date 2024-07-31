@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 public class SetPickChampionId {
 
@@ -17,8 +19,9 @@ public class SetPickChampionId {
     }
 
     @PostMapping("/setPickChampion")
-    public void setPickChampionId(@RequestParam String championId) {
-        pickChampionId.setChampionId(Integer.parseInt(championId));
-        System.out.println("Set championId to " + championId);
+    public void setPickChampionId(@RequestParam Map<String,String> pickChampion) {
+        pickChampionId.setChampionId(Integer.parseInt(pickChampion.get("championId")));
+        pickChampionId.setState(pickChampion.get("state"));
+        System.out.println("Set championId to " + pickChampion);
     }
 }

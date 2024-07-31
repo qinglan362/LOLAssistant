@@ -1,6 +1,7 @@
 package com.ywh.yxlmzs.service;
 
 import com.ywh.yxlmzs.WebSocket.ClientWebSocket;
+import com.ywh.yxlmzs.utils.BanChampionId;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import com.ywh.yxlmzs.utils.PickChampionId;
 import com.ywh.yxlmzs.utils.WebSocketSSL;
@@ -18,11 +19,13 @@ public class WebSocketRegistrationService {
 
     private GetGlobalTokenAndPort getGlobalTokenAndPort;
     private PickChampionId pickChampionId;
+    private BanChampionId banChampionId;
 
     @Autowired
-    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId) {
+    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId,BanChampionId banChampionId) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.pickChampionId=pickChampionId;
+        this.banChampionId=banChampionId;
     }
 
     @Getter
@@ -33,7 +36,7 @@ public class WebSocketRegistrationService {
 
         StandardWebSocketClient client = new StandardWebSocketClient();
         client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
-        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId);
+        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId,banChampionId);
         WebSocketConnectionManager manager = new WebSocketConnectionManager(client, clientWebSocket, path);
 
         // 添加Basic Auth认证信息到Header中

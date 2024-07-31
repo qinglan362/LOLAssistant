@@ -3,6 +3,7 @@ package com.ywh.yxlmzs.WebSocket;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ywh.yxlmzs.utils.BanChampionId;
 import com.ywh.yxlmzs.utils.CallApi;
 
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
@@ -26,11 +27,13 @@ public class ClientWebSocket extends TextWebSocketHandler {
     private GetGlobalTokenAndPort getGlobalTokenAndPort;
 
     private PickChampionId pickChampionId;
+    private BanChampionId banChampionId;
 
     @Autowired
-    public ClientWebSocket(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId) {
+    public ClientWebSocket(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId,BanChampionId banChampionId) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.pickChampionId=pickChampionId;
+        this.banChampionId=banChampionId;
     }
 
     @Override
@@ -44,34 +47,83 @@ public class ClientWebSocket extends TextWebSocketHandler {
         String  port=getGlobalTokenAndPort.getPort();
         String  token=getGlobalTokenAndPort.getToken();
         ObjectMapper objectMapper=new ObjectMapper();
-     if (message.getPayload().contains("Found")) {
+        System.out.println(objectMapper.readTree(message.getPayload()).toPrettyString());
+        System.out.println("----------------------------------------------------------");
+         if (message.getPayload().contains("Found")) {
             String Url= "/lol-matchmaking/v1/ready-check/accept";
             callApi.callApiPost(Url,token,port,null);
         }
-
-        if (message.getPayload().contains("/lol-champ-select/v1/session")){
-              JsonNode jsonNode=objectMapper.readTree(message.getPayload());
-              if (jsonNode.get(2).get("data").get("timer").get("phase").asText().equals("BAN_PICK")) {
+                 if (message.getPayload().contains("/lol-champ-select/v1/session")){
+                  JsonNode jsonNode=objectMapper.readTree(message.getPayload());
+                  if (jsonNode.get(2).get("data").get("timer").get("phase").asText().equals("BAN_PICK")) {
+                  JsonNode jsonNode1=jsonNode.get(2).get("data").get("actions");
                   int cellId=jsonNode.get(2).get("data").get("localPlayerCellId").asInt();
-                  int id = 0;
-                  JsonNode jsonNode1=jsonNode.get(2).get("data").get("actions").get(0);
-                  Map<String,Object> map=null;
-                  for (JsonNode jsonNode2:jsonNode1){
-                      if (jsonNode2.get("actorCellId").asInt()==cellId){
-                            map=Map.of(
-                                  "actorCellId",cellId,
-                                  "championId",pickChampionId.getChampionId(),
-                                  "completed","true",
-                                  "id",jsonNode2.get("id").asText(),
-                                  "isAllyAction","true",
-                                  "type","pick"
-                          );
-                          id=jsonNode2.get("id").asInt();
-                      }
-                  }
-                  if (map != null && (map.get("championId") != null || map.get("championId") != "")) {
-                      callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map);
-                  }
+                  //actions是个数组，里面有很多个json对象，如何遍历
+                      for (JsonNode subArray : jsonNode1) {
+                          int id;
+                          Map<String,Object> map;
+                          for (JsonNode jsonNode2 : subArray) {
+                              if (jsonNode2.get("actorCellId").asInt()==cellId&&jsonNode2.get("completed").asText().equals("false")){
+                                  if (jsonNode2.get("type").asText().equals("pick")&&pickChampionId.getState().equals("start")) {
+                                      map=Map.of(
+                                              "actorCellId",cellId,
+                                              "championId",pickChampionId.getChampionId(),
+                                              "completed","true",
+                                              "id",jsonNode2.get("id").asText(),
+                                              "isAllyAction","true",
+                                              "type","pick"
+                                      );
+                                      id=jsonNode2.get("id").asInt();
+                                      callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map);
+                                      break;
+                                  }
+                                  if (jsonNode2.get("type").asText().equals("ban")&&banChampionId.getState().equals("start")) {
+                                      map=Map.of(
+                                              "actorCellId",cellId,
+                                              "championId",banChampionId.getChampionId(),
+                                              "completed","true",
+                                              "id",jsonNode2.get("id").asText(),
+                                              "isAllyAction","true",
+                                              "type","ban"
+                                      );
+                                      id=jsonNode2.get("id").asInt();
+                                      callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map);
+                                      break;
+                                  }
+                              }
+                             }
+                          }
+
+//                  for (JsonNode jsonNode2:jsonNode1){
+//                      if (jsonNode2.get("actorCellId").asInt()==cellId&&jsonNode2.get("completed").asText().equals("false")){
+//                          if (jsonNode2.get("type").asText().equals("pick")&&pickChampionId.getState().equals("start")) {
+//                              map=Map.of(
+//                                      "actorCellId",cellId,
+//                                      "championId",pickChampionId.getChampionId(),
+//                                      "completed","true",
+//                                      "id",jsonNode2.get("id").asText(),
+//                                      "isAllyAction","true",
+//                                      "type","pick"
+//                              );
+//                              id=jsonNode2.get("id").asInt();
+//                              callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map);
+//                              break;
+//                          }
+//                          if (jsonNode2.get("type").asText().equals("ban")&&banChampionId.getState().equals("start")) {
+//                              map=Map.of(
+//                                      "actorCellId",cellId,
+//                                      "championId",banChampionId.getChampionId(),
+//                                      "completed","true",
+//                                      "id",jsonNode2.get("id").asText(),
+//                                      "isAllyAction","true",
+//                                      "type","ban"
+//                              );
+//                              id=jsonNode2.get("id").asInt();
+//                              callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map);
+//                              break;
+//                          }
+//                      }
+//                  }
               }
         }
 

@@ -14,7 +14,8 @@ public class WatcClient {
     @GetMapping("/StartWebSocketApi")
     public String startWatching(@RequestParam String message) throws Exception {
             webSocketRegistrationService.getClientWebSocket().subscribe(message);
-         return "Started watching " + message;
+            webSocketRegistrationService.getClientWebSocket().subscribe("[5, \"OnJsonApiEvent_lol-champ-select_v1_session\"]");
+           return "Started watching " + message;
     }
 
     @GetMapping("/StopWebSocketApi")
