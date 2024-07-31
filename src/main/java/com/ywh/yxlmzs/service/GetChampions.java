@@ -18,8 +18,8 @@ import java.util.List;
 @Service
 public class GetChampions {
 
-        private Version  globalVersion;
-        private AllChampions allChampions;
+        private final Version  globalVersion;
+        private final AllChampions allChampions;
         @Autowired
         public GetChampions(Version version, AllChampions allChampions) {
             this.globalVersion = version;

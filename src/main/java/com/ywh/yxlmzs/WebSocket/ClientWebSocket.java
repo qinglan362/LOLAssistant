@@ -7,7 +7,6 @@ import com.ywh.yxlmzs.utils.CallApi;
 
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import com.ywh.yxlmzs.utils.PickChampionId;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -23,9 +22,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
 
     private WebSocketSession session;
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
 
-    private PickChampionId pickChampionId;
+    private final PickChampionId pickChampionId;
 
     @Autowired
     public ClientWebSocket(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId) {
@@ -44,18 +43,22 @@ public class ClientWebSocket extends TextWebSocketHandler {
         String  port=getGlobalTokenAndPort.getPort();
         String  token=getGlobalTokenAndPort.getToken();
         ObjectMapper objectMapper=new ObjectMapper();
-     if (message.getPayload().contains("Found")) {
+
+        System.out.println(objectMapper.readTree(message.getPayload()));
+
+        if (message.getPayload().contains("Found")) {
             String Url= "/lol-matchmaking/v1/ready-check/accept";
             callApi.callApiPost(Url,token,port,null);
         }
-
         if (message.getPayload().contains("/lol-champ-select/v1/session")){
               JsonNode jsonNode=objectMapper.readTree(message.getPayload());
+            System.out.println(jsonNode);
               if (jsonNode.get(2).get("data").get("timer").get("phase").asText().equals("BAN_PICK")) {
                   int cellId=jsonNode.get(2).get("data").get("localPlayerCellId").asInt();
                   int id = 0;
                   JsonNode jsonNode1=jsonNode.get(2).get("data").get("actions").get(0);
                   Map<String,Object> map=null;
+                  Map<String,Object> map1=null;
                   for (JsonNode jsonNode2:jsonNode1){
                       if (jsonNode2.get("actorCellId").asInt()==cellId){
                             map=Map.of(
@@ -66,16 +69,23 @@ public class ClientWebSocket extends TextWebSocketHandler {
                                   "isAllyAction","true",
                                   "type","pick"
                           );
+//                            map1=Map.of(
+//                                    "actorCellId",cellId,
+//                                    "championId",84,
+//                                    "completed","true",
+//                                    "id",jsonNode2.get("id").asText(),
+//                                    "isAllyAction","true",
+//                                    "type","ban"
+//                            );
                           id=jsonNode2.get("id").asInt();
                       }
                   }
-                  if (map != null && (map.get("championId") != null || map.get("championId") != "")) {
+                  if (map != null && (map.get("championId") != null || map.get("championId") != "")&&Integer.parseInt((String) map.get("championId"))!=-1) {
                       callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map);
                   }
+                    // callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + id, token, port, map1);
               }
         }
-
-
     }
 
     @Override

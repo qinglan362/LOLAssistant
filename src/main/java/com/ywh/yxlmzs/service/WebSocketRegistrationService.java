@@ -16,8 +16,8 @@ import java.util.Base64;
 @Service
 public class WebSocketRegistrationService {
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
-    private PickChampionId pickChampionId;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final PickChampionId pickChampionId;
 
     @Autowired
     public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId) {

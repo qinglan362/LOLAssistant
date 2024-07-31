@@ -4,15 +4,10 @@ import com.ywh.yxlmzs.service.GetChampions;
 import com.ywh.yxlmzs.service.GetVersion;
 import com.ywh.yxlmzs.service.WebSocketRegistrationService;
 import jakarta.annotation.Resource;
-import kong.unirest.JsonResponse;
 import kong.unirest.Unirest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,10 +26,10 @@ public class StartupRunner implements CommandLineRunner {
     @Resource
     WebSocketRegistrationService webSocketRegistrationService;
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
-    private Position position;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final Position position;
     @Autowired
-    public StartupRunner(GetGlobalTokenAndPort getGlobalTokenAndPort, Position position,CallApi callApi) {
+    public StartupRunner(GetGlobalTokenAndPort getGlobalTokenAndPort, Position position ) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.position = position;
     }

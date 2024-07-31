@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 public class CreateFiveXunLian {
 
-    private  GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
 
     @Autowired
     public CreateFiveXunLian(GetGlobalTokenAndPort getGlobalTokenAndPort) {

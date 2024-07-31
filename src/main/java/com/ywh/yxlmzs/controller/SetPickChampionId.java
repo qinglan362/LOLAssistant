@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SetPickChampionId {
 
-    private PickChampionId pickChampionId;
+    private final PickChampionId pickChampionId;
 
     @Autowired
     public SetPickChampionId(PickChampionId pickChampionId) {

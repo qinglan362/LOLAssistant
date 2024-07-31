@@ -13,17 +13,13 @@ public class WatcClient {
 
     @GetMapping("/StartWebSocketApi")
     public String startWatching(@RequestParam String message) throws Exception {
-            webSocketRegistrationService.getClientWebSocket().subscribe(message);
-         return "Started watching " + message;
+        webSocketRegistrationService.getClientWebSocket().subscribe(message);
+        return "Started watching " + message;
     }
 
     @GetMapping("/StopWebSocketApi")
     public String stopWatching(@RequestParam String message) throws Exception {
-        try {
-                webSocketRegistrationService.getClientWebSocket().unsubscribe(message);
-                return "Stopped watching " + message;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        webSocketRegistrationService.getClientWebSocket().unsubscribe(message);
+        return "Stopped watching " + message;
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GetVersion {
 
-    private Version globalVersion;
+    private final Version globalVersion;
 
     @Autowired
     public GetVersion(Version version) {

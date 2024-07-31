@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 public class VueGetChampions {
 
-    private AllChampions allChampions;
+    private final AllChampions allChampions;
 
     @Autowired
     public VueGetChampions(AllChampions allChampions) {
