@@ -167,6 +167,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import static com.ywh.yxlmzs.controller.GetCurrentGameSummonersId.getStringStringMap;
+
 @RestController
 public class matchesFromPuuid {
 
@@ -179,10 +181,10 @@ public class matchesFromPuuid {
     @Resource
     GetGameFromGameId getGameFromGameId;
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
-    private AllChampions allChampions;
-    private AllMaps allMaps;
-    private Position position;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final AllChampions allChampions;
+    private final AllMaps allMaps;
+    private final Position position;
 
     @Autowired
     public matchesFromPuuid(GetGlobalTokenAndPort getGlobalTokenAndPort, AllChampions allChampions, AllMaps allMaps, Position position) {
@@ -218,13 +220,11 @@ public class matchesFromPuuid {
 
         List<CompletableFuture<List<MatchRecord>>> futures = gameIds.stream()
                 .map(gameId -> CompletableFuture.supplyAsync(() -> fetchMatchRecords(gameId, gameDate, gameMode, champions)))
-                .collect(Collectors.toList());
+                .toList();
 
-        List<List<MatchRecord>> gameDetailsList = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenApply(v -> futures.stream().map(CompletableFuture::join).collect(Collectors.toList()))
                 .get();
-
-        return gameDetailsList;
     }
 
     private List<MatchRecord> fetchMatchRecords(String gameId, Map<String, String> gameDate, Map<String, String> gameMode, List<Champion> champions) {
@@ -267,13 +267,7 @@ public class matchesFromPuuid {
     }
 
     public Map<String, String> getMapNameById() {
-        Map<String, String> maps = new HashMap<>();
-        for (int i = 0; i < allMaps.getList().size(); i++) {
-            String id = allMaps.getList().get(i).getId();
-            String name = allMaps.getList().get(i).getName();
-            maps.put(id, name);
-        }
-        return maps;
+        return getStringStringMap(allMaps);
     }
 
     public Rank rank(String puuId) throws JsonProcessingException {

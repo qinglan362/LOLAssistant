@@ -27,13 +27,11 @@ public class GetCurrentGameSummonersId {
     @Resource
     CallApi callApi;
     @Resource
-    ObjectMapper objectMapper;
-    @Resource
     GetGameFromGameId getGameFromGameId;
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
-    private AllChampions allChampions;
-    private AllMaps allMaps;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final AllChampions allChampions;
+    private final AllMaps allMaps;
     @Autowired
     public GetCurrentGameSummonersId(GetGlobalTokenAndPort getGlobalTokenAndPort, AllChampions allChampions, AllMaps allMaps) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
@@ -123,9 +121,13 @@ public class GetCurrentGameSummonersId {
 
     public Map<String,String>  getMapNameById() {
 
+        return getStringStringMap(allMaps);
+    }
+
+    static Map<String, String> getStringStringMap(AllMaps allMaps) {
         Map<String, String> maps = new HashMap<>();
 
-        for (int i=0;i<allMaps.getList().size();i++){
+        for (int i = 0; i< allMaps.getList().size(); i++){
             String id= allMaps.getList().get(i).getId();
             String name= allMaps.getList().get(i).getName();
             maps.put(id,name);

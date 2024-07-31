@@ -22,7 +22,7 @@ public class GetBackdrop {
     @Resource
     GetSummoners getSummoners;
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
     @Autowired
     public GetBackdrop(GetGlobalTokenAndPort getGlobalTokenAndPort) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;

@@ -6,7 +6,6 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.Map;
 
 @Service
@@ -15,7 +14,7 @@ public class GetSummoners {
     @Resource
     CallApi callApi;
 
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
 
     @Autowired
     public GetSummoners(GetGlobalTokenAndPort getGlobalTokenAndPort) {

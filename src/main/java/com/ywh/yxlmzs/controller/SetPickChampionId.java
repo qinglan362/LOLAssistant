@@ -11,7 +11,7 @@ import java.util.Map;
 @RestController
 public class SetPickChampionId {
 
-    private PickChampionId pickChampionId;
+    private final PickChampionId pickChampionId;
 
     @Autowired
     public SetPickChampionId(PickChampionId pickChampionId) {

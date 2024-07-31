@@ -13,9 +13,7 @@ public class GetGameFromGameId {
 
     @Resource
     CallApi callApi;
-//    @Resource
-//    GetGlobalTokenAndPort getGlobalTokenAndPort;
-    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
 
     @Autowired
     public GetGameFromGameId(GetGlobalTokenAndPort getGlobalTokenAndPort) {

@@ -29,7 +29,7 @@ public class  CallApi {
         return response.getBody();
     }
 
-    public String callApiPatch(String url, String token, String port, Map<String,Object> params) {
+    public void callApiPatch(String url, String token, String port, Map<String,Object> params) {
         String Auth="riot:"+token;
         String cmlvdD= Base64.getEncoder().encodeToString(Auth.getBytes());
         HttpResponse<String> response = Unirest.patch("https://127.0.0.1:"+port+url)
@@ -37,7 +37,7 @@ public class  CallApi {
                 .header("Authorization", "Basic "+cmlvdD)
                 .body(params)
                 .asString();
-        return response.getBody();
+        response.getBody();
     }
     public String callApiPut(String url, String token, String port, Map<String,Object> params) {
         String Auth="riot:"+token;
