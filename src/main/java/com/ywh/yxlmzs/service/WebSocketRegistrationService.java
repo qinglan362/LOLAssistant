@@ -1,10 +1,7 @@
 package com.ywh.yxlmzs.service;
 
 import com.ywh.yxlmzs.WebSocket.ClientWebSocket;
-import com.ywh.yxlmzs.utils.BanChampionId;
-import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
-import com.ywh.yxlmzs.utils.PickChampionId;
-import com.ywh.yxlmzs.utils.WebSocketSSL;
+import com.ywh.yxlmzs.utils.*;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,12 +17,16 @@ public class WebSocketRegistrationService {
     private GetGlobalTokenAndPort getGlobalTokenAndPort;
     private PickChampionId pickChampionId;
     private BanChampionId banChampionId;
+    private AutoContinueNextGame autoContinueNextGame;
+    private AutoAccecptMatch autoAccecptMatch;
 
     @Autowired
-    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId,BanChampionId banChampionId) {
+    public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,PickChampionId pickChampionId,BanChampionId banChampionId,AutoContinueNextGame autoContinueNextGame,AutoAccecptMatch autoAccecptMatch) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.pickChampionId=pickChampionId;
         this.banChampionId=banChampionId;
+        this.autoContinueNextGame=autoContinueNextGame;
+        this.autoAccecptMatch=autoAccecptMatch;
     }
 
     @Getter
@@ -36,7 +37,7 @@ public class WebSocketRegistrationService {
 
         StandardWebSocketClient client = new StandardWebSocketClient();
         client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
-        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId,banChampionId);
+        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId,banChampionId,autoContinueNextGame,autoAccecptMatch);
         WebSocketConnectionManager manager = new WebSocketConnectionManager(client, clientWebSocket, path);
 
         // 添加Basic Auth认证信息到Header中

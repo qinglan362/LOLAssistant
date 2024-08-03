@@ -43,14 +43,14 @@ public class StartupRunner implements CommandLineRunner {
         getChampions.getChampions();
         startWebsocket();
         setPositions();
-    }
+      }
 
     public void startWebsocket() throws Exception {
         String  port = getGlobalTokenAndPort.getPort();
         String  token = getGlobalTokenAndPort.getToken();
         String url = "wss://127.0.0.1:"+port+"/";
         webSocketRegistrationService.registerWebSocketHandler(url, "riot", token);
-    }
+       }
     public void setPositions(){
         Map<String, String> position = new HashMap<>();
         position.put("IRON", "黑铁");

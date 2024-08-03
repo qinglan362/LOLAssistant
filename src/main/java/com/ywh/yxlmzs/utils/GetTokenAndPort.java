@@ -16,6 +16,9 @@ import static java.lang.Thread.sleep;
 @Service
 public class GetTokenAndPort {
 
+    public static Pattern appPortPattern = Pattern.compile("--app-port=(\\d+)");
+    public static Pattern tokenPattern = Pattern.compile("--remoting-auth-token=([\\w-]+)");
+
     private final GetGlobalTokenAndPort getGlobalTokenAndPort;
 
     @Autowired
@@ -24,6 +27,45 @@ public class GetTokenAndPort {
     }
 
     public void getPortAndToken() throws IOException {
+//        String cmd = "WMIC PROCESS WHERE \"name='LeagueClientUx.exe'\" GET commandline";
+//        BufferedReader reader1 = null;
+//        Process process1 = null;
+//       String token1="";
+//       String port1="";
+//        try {
+//            process1 = Runtime.getRuntime().exec(cmd);
+//            // windows 命令必须gbk编码
+//            reader1 = new BufferedReader(new InputStreamReader(process1.getInputStream(), "gb2312"));
+//            String line1;
+//
+//            while ((line1 = reader1.readLine()) != null) {
+//                System.out.println(line1);
+//                Matcher appPortMatcher = appPortPattern.matcher(line1);
+//                Matcher tokenPatternMatcher = tokenPattern.matcher(line1);
+//                if (tokenPatternMatcher.find()) {
+//                    token1=(tokenPatternMatcher.group(1));
+//                }
+//                if (appPortMatcher.find()) {
+//                    port1=(appPortMatcher.group(1));
+//                }
+//
+//            }
+//        }finally {
+//            if (reader1 != null) {
+//                try {
+//                    reader1.close();
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//            if (process1 != null) {
+//                process1.getErrorStream().close();
+//                process1.getOutputStream().close();
+//            }
+//        }
+//        System.out.println("port:"+port1+"token:"+token1);
+        //
+
         StringBuilder output = new StringBuilder();
 
         ClassPathResource classPathResource = new ClassPathResource("run_as_admin.bat");

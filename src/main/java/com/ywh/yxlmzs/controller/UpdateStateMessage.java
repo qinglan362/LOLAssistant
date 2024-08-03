@@ -1,12 +1,12 @@
 package com.ywh.yxlmzs.controller;
 
-import com.ywh.yxlmzs.service.GetSummoners;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +17,8 @@ public class UpdateStateMessage {
 
     @Resource
     CallApi callApi;
+    @Resource
+    ObjectMapper objectMapper;
 
     private GetGlobalTokenAndPort getGlobalTokenAndPort;
     @Autowired
@@ -25,7 +27,7 @@ public class UpdateStateMessage {
     }
 
     @PostMapping("/updateStateMessage")
-    public String updateStateMessage(@RequestParam String message) {
+    public String updateStateMessage(@RequestParam String message) throws JsonProcessingException {
         callApi.callApiPut("/lol-chat/v1/me",  getGlobalTokenAndPort.getToken(), getGlobalTokenAndPort.getPort(), Map.of("statusMessage", message));
         return "success";
     }
