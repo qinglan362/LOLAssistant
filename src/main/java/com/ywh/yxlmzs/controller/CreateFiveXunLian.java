@@ -24,29 +24,28 @@ public class CreateFiveXunLian {
     CallApi callApi;
 
 
-   @PostMapping("/createFiveXunLian")
-   public String createFiveXunLian() throws IOException {
-    String url = "/lol-lobby/v2/lobby";
-    String token = getGlobalTokenAndPort.getToken();
-    String port = getGlobalTokenAndPort.getPort();
-       System.out.println(11);
-    Map<String, Object> map = Map.of(
-            "customGameLobby", Map.of(
-                    "configuration", Map.of(
-                            "gameMode", "PRACTICETOOL",
-                            "gameMutator", "",
-                            "gameServerRegion", "",
-                            "mapId", 11,
-                            "mutators", Map.of("id", 1),
-                            "spectatorPolicy", "AllAllowed",
-                            "teamSize", 5
-                    ),
-                    "lobbyName", "PRACTICETOOL",
-                    "lobbyPassword", ""
-            ),
-            "isCustom", true
-    );
+    @PostMapping("/createFiveXunLian")
+    public String createFiveXunLian() throws IOException {
+        String url = "/lol-lobby/v2/lobby";
+        String token = getGlobalTokenAndPort.getToken();
+        String port = getGlobalTokenAndPort.getPort();
+        Map<String, Object> map = Map.of(
+                "customGameLobby", Map.of(
+                        "configuration", Map.of(
+                                "gameMode", "PRACTICETOOL",
+                                "gameMutator", "",
+                                "gameServerRegion", "",
+                                "mapId", 11,
+                                "mutators", Map.of("id", 1),
+                                "spectatorPolicy", "AllAllowed",
+                                "teamSize", 5
+                        ),
+                        "lobbyName", "PRACTICETOOL",
+                        "lobbyPassword", ""
+                ),
+                "isCustom", true
+        );
 
-    return callApi.callApiPost(url, token, port, map);
-}
+        return callApi.callApiPost(url, token, port, map);
+    }
 }

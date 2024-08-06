@@ -1,5 +1,7 @@
 package com.ywh.yxlmzs.utils;
 
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.service.GetChampions;
 import com.ywh.yxlmzs.service.GetVersion;
 import com.ywh.yxlmzs.service.WebSocketRegistrationService;
@@ -10,6 +12,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.Thread.sleep;
 
 @Component
 public class StartupRunner implements CommandLineRunner {
@@ -22,6 +26,10 @@ public class StartupRunner implements CommandLineRunner {
     GetVersion getVersion;
     @Resource
     GetChampions getChampions;
+    @Resource
+    CallApi callApi;
+    @Resource
+    ObjectMapper objectMapper;
 
     @Resource
     WebSocketRegistrationService webSocketRegistrationService;
@@ -44,7 +52,6 @@ public class StartupRunner implements CommandLineRunner {
         startWebsocket();
         setPositions();
       }
-
     public void startWebsocket() throws Exception {
         String  port = getGlobalTokenAndPort.getPort();
         String  token = getGlobalTokenAndPort.getToken();

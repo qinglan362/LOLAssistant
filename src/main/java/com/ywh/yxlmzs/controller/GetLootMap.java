@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 public class GetLootMap {
@@ -182,6 +184,7 @@ public class GetLootMap {
             }
             else if (message.equals("eternals")){
                 if (node.get("displayCategories").asText().equals("ETERNALS")) {
+                    int champId = Integer.parseInt(Objects.requireNonNull(extractChampId(String.valueOf(node.get("tags")))));
                     Long rootId= 0L;
                     if (node.get("type").asText().equals("STATSTONE_SHARD")){
                         rootId=Long.valueOf(node.get("lootId").asText().split("_")[2]);
@@ -199,26 +202,26 @@ public class GetLootMap {
                     recipes.setLootName(node.get("lootName").asText());
                     recipes.setDisplayCategories(node.get("type").asText());
                     recipes.setIsRental(node.get("isRental").asBoolean());
-                    if (!Files.exists(Paths.get(System.getProperty("user.dir")+"/images/eternals/"+rootId + ".jpg"))) {
+                    if (!Files.exists(Paths.get(System.getProperty("user.dir")+"/images/champion/"+champId + ".jpg"))) {
                         String url = node.get("splashPath").asText();
                         byte[] imageBytes = callApi.callApiGetImage(url,
                                 getGlobalTokenAndPort.getToken(),
                                 getGlobalTokenAndPort.getPort(),
                                 null);
-                        String directoryPath = System.getProperty("user.dir")+"/images/eternals/";
+                        String directoryPath = System.getProperty("user.dir")+"/images/champion/";
                         Files.createDirectories(Paths.get(directoryPath));
-                        try (FileOutputStream fos = new FileOutputStream(directoryPath +rootId + ".jpg")) {
+                        try (FileOutputStream fos = new FileOutputStream(directoryPath +champId + ".jpg")) {
                             fos.write(imageBytes);
                         }catch (IOException e){
                             e.printStackTrace();
                         }
-                        BufferedImage image = ImageIO.read(new File(directoryPath +rootId + ".jpg"));
+                        BufferedImage image = ImageIO.read(new File(directoryPath +champId + ".jpg"));
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ImageIO.write(image, "jpg", baos);
                         String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
                         recipes.setBase64Image(base64Image);
                     }else{
-                        BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/eternals/"+rootId + ".jpg"));
+                        BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/champion/"+champId + ".jpg"));
                         ByteArrayOutputStream baos = new ByteArrayOutputStream();
                         ImageIO.write(image, "jpg", baos);
                         String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
@@ -354,6 +357,15 @@ public class GetLootMap {
 
         }
         return recipesList;
+    }
+    public static String extractChampId(String input) {
+        Pattern pattern = Pattern.compile("champId=(\\d+)");
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(1);
+        } else {
+            return null; // or throw an exception if you prefer
+        }
     }
 
 }

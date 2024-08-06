@@ -198,7 +198,6 @@ const toggleImageSelection = (item) => {
   chooseCount.value=chooseImage.value.length
   console.log(chooseCount.value)
 };
-
 // 添加这个方法来检查图片是否被选中
 const isImageSelected = (item) => {
   return chooseImage.value.some(img => img.storeItemId === item.storeItemId);
@@ -334,6 +333,851 @@ const  CheckName=()=>{
     }
   });
 }
+//
+const dialogTableVisible2=ref(false)
+const dialogTableVisible3=ref(false)
+const chooseChampionForChooseSkin=ref('')
+const allChampionsSkins=ref([])
+const chooseWantChangeSkin=ref([])
+const chooseSkinName=ref('')
+const getOneChampionSkin=()=>{
+  dialogTableVisible3.value=true
+  console.log(chooseChampionForChooseSkin.value)
+  $.ajax({
+    url: "http://localhost:8089/getOneChampionSkin",
+    type: "Get",
+    data: {
+      championId: chooseChampionForChooseSkin.value
+    },
+    success(resp) {
+      allChampionsSkins.value=resp
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
+const toggleImageSelection1 = (item) => {
+  const index = chooseWantChangeSkin.value.findIndex(img => img.skinId === item.skinId);
+  if (index === -1) {
+    chooseWantChangeSkin.value=[]
+    chooseSkinName.value=''
+    chooseWantChangeSkin.value.push(item);
+    chooseSkinName.value=item.name
+  } else {
+    chooseWantChangeSkin.value.splice(index, 1);
+    chooseSkinName.value=''
+  }
+};
+const isImageSelected1 = (item) => {
+  return chooseWantChangeSkin.value.some(img => img.skinId === item.skinId);
+};
+const updateSkin=()=>{
+  dialogTableVisible3.value=false
+  dialogTableVisible2.value=false
+  $.ajax({
+    url: "http://localhost:8089/changeBackGroundImage",
+    type: "Post",
+    contentType: "application/json",  // 设置内容类型为 JSON
+    data: JSON.stringify(chooseWantChangeSkin.value),  // 将数组转换为 JSON 字符串
+    success(resp) {
+      console.log(resp);
+      ElMessage.success("修改成功")
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+  chooseWantChangeSkin.value=[]
+  chooseSkinName.value=''
+  chooseChampionForChooseSkin.value=''
+}
+//
+const dialogTableVisible4=ref(false)
+const value = ref([])
+const handleChange = (value) => {
+  console.log(value);
+};
+const options=[
+  {
+    value:'RANKED_SOLO_5x5',
+    label:'单排/双排',
+    children:[
+      {
+        value:'IRON',
+        label:'坚韧黑铁',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'BRONZE',
+        label:'英勇黄铜',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'SILVER',
+        label:'不屈白银',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'GOLD',
+        label:'荣耀黄金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'PLATINUM',
+        label:'华贵铂金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'EMERALD',
+        label:'流光翡翠',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'DIAMOND',
+        label:'璀璨钻石',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value: 'MASTER',
+        label: '超凡大师',
+      },
+      {
+        value: 'GRANDMASTER',
+        label: '傲世宗师',
+      },
+      {
+        value: 'CHALLENGER',
+        label: '最强王者',
+      }
+    ]
+  },
+  {
+    value:'RANKED_FLEX_SR',
+    label:'灵活组排 5v5',
+    children:[
+      {
+        value:'IRON',
+        label:'坚韧黑铁',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'BRONZE',
+        label:'英勇黄铜',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'SILVER',
+        label:'不屈白银',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'GOLD',
+        label:'荣耀黄金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'PLATINUM',
+        label:'华贵铂金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value: 'EMERALD',
+        label: '流光翡翠',
+        children: [
+          {
+            value: 'IV',
+            label: 'IV',
+          },
+          {
+            value: 'III',
+            label: 'III',
+          },
+          {
+            value: 'II',
+            label: 'II',
+          },
+          {
+            value: 'I',
+            label: 'I',
+          }
+        ]
+      },
+      {
+        value: 'DIAMOND',
+        label: '璀璨钻石',
+        children: [
+          {
+            value: 'IV',
+            label: 'IV',
+          },
+          {
+            value: 'III',
+            label: 'III',
+          },
+          {
+            value: 'II',
+            label: 'II',
+          },
+          {
+            value: 'I',
+            label: 'I',
+          }
+        ]
+      },
+      {
+        value: 'MASTER',
+        label: '超凡大师',
+      },
+      {
+        value: 'GRANDMASTER',
+        label: '傲世宗师',
+      },
+      {
+        value: 'CHALLENGER',
+        label: '最强王者',
+      }
+     ]
+  },
+  {
+    value:'RANKED_TFT',
+    label:'云顶之弈 (排位赛)',
+    children:[
+      {
+        value:'IRON',
+        label:'坚韧黑铁',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'BRONZE',
+        label:'英勇黄铜',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'SILVER',
+        label:'不屈白银',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'GOLD',
+        label:'荣耀黄金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'PLATINUM',
+        label:'华贵铂金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'EMERALD',
+        label:'流光翡翠',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'DIAMOND',
+        label:'璀璨钻石',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value: 'MASTER',
+        label: '超凡大师',
+      },
+      {
+        value: 'GRANDMASTER',
+        label: '傲世宗师',
+      },
+      {
+        value: 'CHALLENGER',
+        label: '最强王者',
+      }
+    ]
+  },
+  {
+    value:'RANKED_TFT_DOUBLE_UP',
+    label:'云顶之弈 (双人作战 beta测试)',
+    children:[
+      {
+        value:'IRON',
+        label:'坚韧黑铁',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'BRONZE',
+        label:'英勇黄铜',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'SILVER',
+        label:'不屈白银',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'GOLD',
+        label:'荣耀黄金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'PLATINUM',
+        label:'华贵铂金',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'EMERALD',
+        label:'流光翡翠',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value:'DIAMOND',
+        label:'璀璨钻石',
+        children:[
+          {
+            value:'IV',
+            label:'IV',
+          },
+          {
+            value:'III',
+            label:'III',
+          },
+          {
+            value:'II',
+            label:'II',
+          },
+          {
+            value:'I',
+            label:'I',
+          }
+        ]
+      },
+      {
+        value: 'MASTER',
+        label: '超凡大师',
+      },
+      {
+        value: 'GRANDMASTER',
+        label: '傲世宗师',
+      },
+      {
+        value: 'CHALLENGER',
+        label: '最强王者',
+      }
+    ]
+  }
+]
+const setRank=()=>{
+  dialogTableVisible4.value=false
+  $.ajax({
+    url: "http://localhost:8089/setRank",
+    type: "Post",
+    data: {
+        rankedLeagueQueue: value.value[0],
+        rankedLeagueTier: value.value[1],
+        rankedLeagueDivision: value.value[2]
+    },
+    success(resp) {
+      ElMessage.success(resp)
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
+//
+const positions=ref([
+  {
+    value: 'TOP',
+    label: '上单',
+  },
+  {
+    value: 'JUNGLE',
+    label: '打野',
+  },
+  {
+    value: 'MIDDLE',
+    label: '中单',
+  },
+  {
+    value: 'BOTTOM',
+    label: '下路',
+  },
+  {
+    value: 'UTILITY',
+    label: '辅助',
+  }
+])
+const autoSearchMatch=()=>{
+
+  store.state.autoSearchMatch=!store.state.autoSearchMatch
+  $.ajax({
+    url: "http://localhost:8089/autoSearchMatch",
+    type: "Post",
+    data: {
+      setAutoSearchMatch: store.state.autoSearchMatch,
+      firstPosition:store.state.firstPosition,
+      secondPosition:store.state.secondPosition
+    },
+    success(resp) {
+      console.log(resp);
+      if (resp==="success"){
+        ElMessage.success("设置成功")
+      }else {
+        ElMessage.error(resp)
+      }
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
+//
+const watchName=ref('')
+
+const watch=()=>{
+ $.ajax({
+    url: "http://localhost:8089/spectateLaunch",
+    type: "Post",
+    data: {
+      name: watchName.value
+    },
+    success(resp) {
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
 </script>
 
 <template>
@@ -399,6 +1243,38 @@ const  CheckName=()=>{
         <el-input style="width: 160px" v-model="checkName" placeholder="格式为:xxxx#xxxx"></el-input>
         <el-button type="primary" @click="CheckName">检测id是否重复可用</el-button>
       </div>
+      <div style="margin-top: 20px">
+        <el-button v-if="store.state.autoSearchMatch===false" type="primary" @click="autoSearchMatch">自动寻找对局</el-button>
+        <el-button v-else type="danger" @click="autoSearchMatch">取消自动寻找对局</el-button>
+            <el-select
+              v-model="store.state.firstPosition"
+              filterable
+              placeholder="选择第一选位置(默认中单)"
+              style="width: 120px"
+              :disabled="store.state.autoSearchMatch"
+          >
+            <el-option
+                v-for="item in positions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-select>
+          <el-select
+              v-model="store.state.secondPosition"
+              filterable
+              placeholder="选择第二选位置（默认打野）"
+              style="width: 120px"
+              :disabled="store.state.autoSearchMatch"
+          >
+            <el-option
+                v-for="item in positions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            />
+          </el-select>
+      </div>
     </el-col>
     <el-col :span="6">
       <div>
@@ -425,7 +1301,57 @@ const  CheckName=()=>{
           <el-button @click="ban" type="primary" round>确定</el-button>
         </el-dialog>
       </div>
-
+        <div style="margin-top: 20px">
+          <el-button type="primary" @click="dialogTableVisible2=true">修改生涯图片背景(可选择没有的皮肤)</el-button>
+          <el-dialog v-model="dialogTableVisible2" title="选择英雄" width="300">
+            <el-select
+                v-model="chooseChampionForChooseSkin"
+                filterable
+                placeholder="Select"
+                style="width: 240px"
+            >
+              <el-option
+                  v-for="item in store.state.champions"
+                  :key="item.key"
+                  :label="item.name"
+                  :value="item.key"
+              />
+            </el-select>
+            <el-button style="margin-top: 20px" v-if="chooseChampionForChooseSkin!==''" type="primary" @click="getOneChampionSkin">选择该英雄的皮肤</el-button>
+          </el-dialog>
+          <el-dialog v-model="dialogTableVisible3" title="选择皮肤" width="1500">
+            <el-row>
+              <el-col
+                  v-for="(item) in allChampionsSkins"
+                  :key="item.skinId"
+                  :span="4"
+              >
+                <el-row>
+                  <el-col :span="12">
+                    <img
+                        :src="imageInfoSrc(item.image)"
+                        :class="{ 'selected-image': isImageSelected1(item) }"
+                        style="width: 100%; height: 100px; cursor: pointer;"
+                        alt=""
+                        @click="toggleImageSelection1(item)"
+                    >
+                  </el-col>
+                  <el-col :span="12">
+                    <div style="margin-left: 15px">
+                      <div style="width: 100%;margin-top: 50%">
+                        {{item.name}}
+                      </div>
+                    </div>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+            <div>
+              已选择皮肤:{{chooseSkinName}}
+              <el-button type="primary" @click="updateSkin">确定修改</el-button>
+            </div>
+          </el-dialog>
+        </div>
     </el-col>
     <el-col :span="6">
       <div>
@@ -447,6 +1373,19 @@ const  CheckName=()=>{
       <div style="margin-top: 20px">
         <el-button v-if="store.state.autoNext===false" type="primary" @click="autoNextGame">自动开启下一局</el-button>
         <el-button v-else type="danger" @click="autoNextGame">取消自动开启下一局</el-button>
+      </div>
+      <div style="margin-top: 20px">
+        <el-button  type="primary" @click="dialogTableVisible4=true">设置段位</el-button>
+        <el-dialog v-model="dialogTableVisible4" title="设置段位" width="500">
+          <div class="m-4">
+            <el-cascader v-model="value" :options="options" @change="handleChange" />
+            <el-button style="margin-left: 20px"  type="primary" @click="setRank">确定设置</el-button>
+          </div>
+        </el-dialog>
+      </div>
+      <div style="margin-top: 20px">
+        <el-input style="width: 160px" v-model="watchName" placeholder="格式为:xxxx#xxxx"></el-input>
+        <el-button type="primary" @click="watch">观战某人</el-button>
       </div>
     </el-col>
   </el-row>
