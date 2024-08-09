@@ -5,7 +5,13 @@
 <template>
   <router-link :to="{name:'someone'}">
     <el-button  type="primary" >
-      获取某人战绩
+      获取某非云顶战绩
+    </el-button>
+  </router-link>
+
+  <router-link  style="margin-left: 100px" :to="{name:'someoneTft'}">
+    <el-button  type="primary" >
+      获取某人云顶战绩
     </el-button>
   </router-link>
 

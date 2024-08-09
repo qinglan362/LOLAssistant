@@ -1,10 +1,10 @@
 package com.ywh.yxlmzs.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +27,15 @@ public class  CallApi {
          return response.getBody();
     }
 
+    public JsonNode callApiGetJson(String url, String token, String port, Map<String,Object> params) {
+        String Auth="riot:"+token;
+        String cmlvdD= Base64.getEncoder().encodeToString(Auth.getBytes());
+        HttpResponse<kong.unirest.JsonNode> response = Unirest.get("https://127.0.0.1:"+port+url)
+                .queryString(params)
+                .header("Authorization", "Basic "+cmlvdD)
+                .asJson();
+        return response.getBody();
+    }
 
     public byte[] callApiGetImage(String url, String token, String port, Map<String,Object> params) throws JsonProcessingException {
         String Auth="riot:"+token;
