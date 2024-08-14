@@ -48,6 +48,9 @@ public class SaveImage {
                         url = ti.get("squarePortraitPath").asText();
                     } else if (type.equals("items")||type.equals("summoner-spells")||type.equals("perks")) {
                         url = ti.get("iconPath").asText();
+                    } else if (type.equals("cherry-augments")) {
+                        System.out.println(ti.get("rarity"));
+                        url = ti.get("augmentSmallIconPath").asText();
                     }
                     break;
                 }
@@ -67,9 +70,6 @@ public class SaveImage {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(image, houzhui, baos);
             String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-            if (fileName.equals("119")) {
-                System.out.println("Dsadasb+"+base64Image);
-            }
            return  base64Image;
         }else{
             BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/"+floderName+"/"+fileName + "."+houzhui));

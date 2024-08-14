@@ -52,7 +52,6 @@ public class ClientWebSocket extends TextWebSocketHandler {
         this.session = session;
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"));
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-gameflow_v1_gameflow-phase\"]"));
-        System.out.println("订阅了");
     }
 
     @Override
@@ -67,7 +66,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
            JSONArray jsonArray = JSONArray.parseArray(message.getPayload());
            JSONObject jsonObject = jsonArray.getJSONObject(2);
            state=jsonObject.getString("data");
-
+           System.out.println("当前状态:"+state);
            if (message.getPayload().contains("Lobby")) {
                if (!Objects.isNull(autoSearchMatch)&&!Objects.isNull(autoSearchMatch.getState())&&!autoSearchMatch.getState().isEmpty()&&autoSearchMatch.getState().equals("true")){
                    while (true){
@@ -103,7 +102,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
                }
            }
            if (message.getPayload().contains("ReadyCheck")) {
-               if (!Objects.isNull(autoAccecptMatch)&&!autoAccecptMatch.getIsAutoAccecptMatch().isEmpty()&&autoAccecptMatch.getIsAutoAccecptMatch().equals("true")){
+               if (!Objects.isNull(autoAccecptMatch.getIsAutoAccecptMatch())&&(!autoAccecptMatch.getIsAutoAccecptMatch().isEmpty())&&autoAccecptMatch.getIsAutoAccecptMatch().equals("true")){
                    String Url= "/lol-matchmaking/v1/ready-check/accept";
                    callApi.callApiPost(Url,token,port,null);
                    System.out.println("自动接受匹配");
@@ -111,11 +110,18 @@ public class ClientWebSocket extends TextWebSocketHandler {
            }
            if (message.getPayload().contains("ChampSelect")) {
                while (state.equals("ChampSelect")) {
-                   sleep(1000);
+                 //  sleep(1000);
                    if ((!Objects.isNull(pickChampionId.getState()) && pickChampionId.getState().equals("start")) ||( !Objects.isNull(banChampionId.getState())&&banChampionId.getState().equals("start"))) {
                        JsonNode jsonNode = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
+                       if (!Objects.isNull(jsonNode.get("message")) &&(jsonNode.get("message").asText().equals("No active delegate")||jsonNode.get("errorCode").asText().equals("RPC_ERROR"))){
+                           break;
+                       }
+                       //phase:PLANING
                        if (!Objects.isNull(jsonNode.get("timer"))) {
-                           if ((!Objects.isNull(jsonNode.get("timer"))&&!Objects.isNull(jsonNode.get("timer").get("phase"))&&jsonNode.get("timer").get("phase").asText().equals("FINALIZATION"))||(!Objects.isNull(jsonNode.get("timer"))&&!Objects.isNull(jsonNode.get("timer").get("phase"))&&jsonNode.get("timer").get("phase").asText().equals("GAME_STARTING"))) {
+                           if ((!Objects.isNull(jsonNode.get("timer"))&&
+                                   !Objects.isNull(jsonNode.get("timer").get("phase"))&&
+                                   jsonNode.get("timer").get("phase").asText().equals("FINALIZATION"))||
+                                   (!Objects.isNull(jsonNode.get("timer"))&&!Objects.isNull(jsonNode.get("timer").get("phase"))&&jsonNode.get("timer").get("phase").asText().equals("GAME_STARTING"))) {
                                  break;
                            }
                            if (jsonNode.get("timer").get("phase").asText().equals("BAN_PICK")) {
@@ -158,6 +164,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
                    }
                }
            }
+           if (message.getPayload().contains("InProgress")) {
+
+           }
            if (message.getPayload().contains("PreEndOfGame")) {
                if (!Objects.isNull(autoContinueNextGame)&&autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
                    String Url1 = "/lol-honor-v2/v1/honor-player";
@@ -167,13 +176,10 @@ public class ClientWebSocket extends TextWebSocketHandler {
                }
            }
            if (message.getPayload().contains("EndOfGame")){
-               System.out.println("1111");
+
                if (!Objects.isNull(autoContinueNextGame)&&autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
                    String Url= "/lol-lobby/v2/play-again";
                    callApi.callApiPost(Url,token,port,null);
-                   System.out.println("游戏结束,开启自动下一句");
-               }else{
-                   System.out.println("游戏结束,没开启自动下一句");
                }
            }
 

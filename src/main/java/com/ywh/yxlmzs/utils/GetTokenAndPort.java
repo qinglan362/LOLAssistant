@@ -102,6 +102,7 @@ public class GetTokenAndPort {
 
                 getGlobalTokenAndPort.setPort(port);
                 getGlobalTokenAndPort.setToken(token);
+                System.out.println("port: " + port + ", token: " + token);
 
             } catch (IOException e) {
                 e.printStackTrace();

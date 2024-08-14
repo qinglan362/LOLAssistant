@@ -178,6 +178,8 @@ public class MatchesTFTFromPuuid {
                 }
                 tftOneMatchDetail.setAugments(augmentsImage);
 
+
+                //羁绊
                 List<String> traitsImage=new ArrayList<>();
                 JsonNode traits=participant.get("traits");
                 for (JsonNode trait:traits){

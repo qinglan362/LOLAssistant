@@ -28,4 +28,6 @@ public class OneMatchDetail {
     private String totalMinionsKilled;
     //斗魂竞技场名次1-8
     private String subteamPlacement;
+    //斗魂竞技场海克斯
+    private List<String> augments;
 }

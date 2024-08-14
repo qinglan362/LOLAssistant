@@ -55,8 +55,7 @@ public class MatchOneDetail {
                 getGlobalTokenAndPort.getPort(),
                 null
          ));
-
-        System.out.println(OneMatchDetails.toPrettyString());
+        System.out.println(OneMatchDetails);
 
         List<OneMatchDetail> oneMatchDetails = new ArrayList<>();
         JsonNode participants = OneMatchDetails.get("participants");
@@ -93,6 +92,18 @@ public class MatchOneDetail {
             }
             oneMatchDetail.setItemsImage(itemsImage);
 
+          //斗 魂竞技场海克斯 这里面也有无尽狂潮的选的增幅海克斯
+            List<String> augments = new ArrayList<>();
+            for (int j = 1; j <=6; j++) {
+                int augmentId = participants.get(i).get("stats").get("playerAugment" + j).asInt();
+                if (augmentId != 0) {
+                    String Image =saveImage.saveImage("augment", String.valueOf(augmentId), "png", "cherry-augments");
+                    augments.add(Image);
+                }
+            }
+            oneMatchDetail.setAugments(augments);
+
+
             List<String> spellImage = new ArrayList<>();
             for (int j = 1; j <=2; j++) {
                 int itemId = participants.get(i).get("spell" + j+"Id").asInt();
@@ -102,6 +113,8 @@ public class MatchOneDetail {
                 }
             }
             oneMatchDetail.setSpellsImage(spellImage);
+
+
 
             //段位 网络获取
             if (currentSeasonRank.equals("")){
