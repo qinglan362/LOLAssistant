@@ -1,7 +1,6 @@
 package com.ywh.yxlmzs.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.recipes;
 import com.ywh.yxlmzs.utils.CallApi;
@@ -9,7 +8,6 @@ import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
@@ -31,7 +29,6 @@ public class DistantLootRecipes {
             String[] playerLootList = {recipe.getLootName()};
             String recipeName="";
             String type=recipe.getDisplayCategories();
-            System.out.println(type);
             if (type.equals("SKIN")) {
                 if (recipe.getIsRental()) {
                     recipeName = "SKIN_RENTAL_disenchant";
@@ -72,13 +69,12 @@ public class DistantLootRecipes {
                     recipeName="CHAMPION_disenchant";
                 }
             }
-            System.out.println(recipeName);
             String url="/lol-loot/v1/recipes/"+recipeName+"/craft?repeat="+Integer.parseInt(recipe.getCount());
-            System.out.println(ob.readTree( callApi.callApiPostObject(url,
+            callApi.callApiPostObject(url,
                     getGlobalTokenAndPort.getToken(),
                     getGlobalTokenAndPort.getPort(),
                     playerLootList
-            )).toPrettyString());
+            );
         }
     }
 }

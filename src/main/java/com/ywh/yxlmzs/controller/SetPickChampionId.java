@@ -22,6 +22,5 @@ public class SetPickChampionId {
     public void setPickChampionId(@RequestParam Map<String,String> pickChampion) {
         pickChampionId.setChampionId(Integer.parseInt(pickChampion.get("championId")));
         pickChampionId.setState(pickChampion.get("state"));
-        System.out.println("Set championId to " + pickChampion);
     }
 }

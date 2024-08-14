@@ -39,10 +39,10 @@ public class spectateLaunch {
                 "gameQueueType", "",
                 "puuid", puuId
         );
-        System.out.println(objectMapper.readTree(callApi.callApiPost("/lol-spectator/v1/spectate/launch",
+      callApi.callApiPost("/lol-spectator/v1/spectate/launch",
                 getGlobalTokenAndPort.getToken(),
                 getGlobalTokenAndPort.getPort(),
-                data)).toPrettyString());
+                data);
         return "success";
     }
 }

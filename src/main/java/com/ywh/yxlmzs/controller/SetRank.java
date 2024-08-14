@@ -21,35 +21,8 @@ public class SetRank {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
     }
 
-    /**
-     * 设置rank段位,默认设置为单排最强王者1
-     * <p>
-     * 段位:
-     * value="IRON">坚韧黑铁
-     * value="BRONZE">英勇黄铜
-     * value="SILVER">不屈白银
-     * value="GOLD">荣耀黄金
-     * value="PLATINUM">华贵铂金
-     * value="EMERALD">流光翡翠
-     * value="DIAMOND">璀璨钻石
-     * value="MASTER">超凡大师
-     * value="GRANDMASTER">傲世宗师
-     * value="CHALLENGER">最强王者
-     * value="UNRANKED">没有段位
-     * 段位级别
-     * value="IV"
-     * value="III"
-     * value="II"
-     * value="I"
-     * rank模式
-     * value="RANKED_SOLO_5x5">单排/双排
-     * value="RANKED_FLEX_SR">灵活组排 5v5
-     * value="RANKED_FLEX_TT">灵活组排 3v3
-     * value="RANKED_TFT">云顶之弈
-     */
     @PostMapping("/setRank")
     public String setRank(@RequestParam Map<String,String> map) {
-        System.out.println(map);
         JSONObject body = new JSONObject(1);
         JSONObject jsonObject = new JSONObject(3);
         jsonObject.put("rankedLeagueQueue",map.get("rankedLeagueQueue"));

@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CheckNameAvailability {
        @Resource
        CallApi callApi;
-       @Resource
-      ObjectMapper ob;
 
       private GetGlobalTokenAndPort getGlobalTokenAndPort;
          @Autowired

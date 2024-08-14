@@ -52,7 +52,7 @@ public class MatchOneTFTDetail {
 
     @GetMapping("/TFTMatchOneDetail")
     public TFT TFTMatchOneDetail(@RequestParam Map<String,String> data) throws IOException {
-        System.out.println(data);
+
         //{currentPage=1, index=0}
         int begIndex=(Integer.parseInt(data.get("currentPage"))-1)*18+Integer.parseInt(data.get("index"));
 
@@ -198,7 +198,6 @@ public class MatchOneTFTDetail {
 
             tft.setTFTOneMatchDetail(tftOneMatchDetails);
 
-        System.out.println(tft);
         return tft;
     }
     public String saveImage(String folderName,

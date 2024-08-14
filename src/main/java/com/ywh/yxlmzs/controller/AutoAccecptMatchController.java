@@ -19,7 +19,6 @@ public class AutoAccecptMatchController {
     @PostMapping("/autoAccecptMatch")
     public String autoAccecptMatch(@RequestParam String isAutoAccecptMatch) {
         autoAccecptMatch.setIsAutoAccecptMatch(isAutoAccecptMatch);
-        System.out.println("set autoAccecptMatch to " + autoAccecptMatch.getIsAutoAccecptMatch());
         return "success";
     }
 }
