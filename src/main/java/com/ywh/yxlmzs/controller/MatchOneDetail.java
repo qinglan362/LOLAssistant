@@ -92,7 +92,7 @@ public class MatchOneDetail {
             }
             oneMatchDetail.setItemsImage(itemsImage);
 
-          //斗 魂竞技场海克斯 这里面也有无尽狂潮的选的增幅海克斯
+          //斗魂竞技场海克斯 这里面也有无尽狂潮的选的增幅海克斯
             List<String> augments = new ArrayList<>();
             for (int j = 1; j <=6; j++) {
                 int augmentId = participants.get(i).get("stats").get("playerAugment" + j).asInt();
@@ -120,19 +120,21 @@ public class MatchOneDetail {
             if (currentSeasonRank.equals("")){
                 currentSeasonRank = "UNRANKED";
              }
-            oneMatchDetail.setRankImage("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/"+currentSeasonRank.toLowerCase()+".png");
+//            oneMatchDetail.setRankImage("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/"+currentSeasonRank.toLowerCase()+".png");
+             //本地获取
+               oneMatchDetail.setRankImage("rank/"+currentSeasonRank.toLowerCase()+".png");
 
 
 //              获取头像存本地
              String championImage = "";
              int itemId = participants.get(i).get("championId").asInt();
              championImage =saveImage.saveImage("championSummary", String.valueOf(itemId), "jpg", "champion-summary");
-             if (itemId==119||itemId==76){
-                 //天杀的 鬼知道德莱文和豹女为什么不行！！！！！
-                 oneMatchDetail.setChampionImage("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/"+itemId+".png");
-             }else{
+//             if (itemId==119||itemId==76){
+//                 //天杀的 鬼知道德莱文和豹女为什么不行！！！！！
+//                 oneMatchDetail.setChampionImage("https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/"+itemId+".png");
+//             }else{
                  oneMatchDetail.setChampionImage(championImage);
-             }
+//         }
 
 //            获取头像网络直接获取
 //            int championId = participants.get(i).get("championId").asInt();

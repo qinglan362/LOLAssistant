@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 public class MatchOneTFTDetail {
     @Resource
@@ -26,7 +28,7 @@ public class MatchOneTFTDetail {
     }
 
     @GetMapping("/TFTMatchOneDetail")
-    public String TFTMatchOneDetail(@RequestParam String gameId) throws JsonProcessingException {
+    public String TFTMatchOneDetail(@RequestParam Map<String,String> data) throws JsonProcessingException {
         //TFT国服好像没有可以根据gameId查询某一局的信息的接口
         ///lol-match-history/v1/games/"+gameId,这个接口是可以查询到某一局的信息的，但是TFT不好用，暂时搁置改为一次查询十次所有信息
 //        System.out.println(gameId);
@@ -37,7 +39,7 @@ public class MatchOneTFTDetail {
 //                null
 //        ));
 //        System.out.println(gameDetail.toPrettyString());
-
+        System.out.println(data);
         return null;
     }
 }

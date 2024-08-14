@@ -102,11 +102,8 @@ const getOneMatch = (row) => {
 };
 //
 const imageInfoSrc = (base64Image) => {
-  return `data:image/jpeg;base64,${base64Image}`;
-};
-const isTrue = (championName) => {
-  console.log(championName)
-  return championName === "荣耀行刑官" || championName === "狂野女猎手";
+  console.log(base64Image)
+  return `http://localhost:8089/images/${base64Image}`;
 };
 
 //判断单独显示斗魂还是正常显示
@@ -194,7 +191,7 @@ const returnMyColorWin= ({row}) => {
       <el-pagination
           @current-change="handleCurrentChange"
           layout="prev, pager, next"
-          :total="250" />
+          :total="560" />
     </el-col>
     <el-col :span="18">
       <div v-if="showPerks(mapNameClick)==='普通模式'">
@@ -210,8 +207,8 @@ const returnMyColorWin= ({row}) => {
            <el-table-column prop="championName" label="角色" width="160">
              <template v-slot="scope">
                <!--            通过读取本地-->
-               <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">
-               <img v-else :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+<!--               <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
+               <img :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
                <!--            通过网络直接获取-->
                <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
                {{ scope.row.matchesListInfo.championName }}
@@ -276,7 +273,7 @@ const returnMyColorWin= ({row}) => {
                    trigger="hover"
                >
                  <template #reference>
-                   <img :src="scope.row.rankImage" style="width: 40px;height: 40px" alt="">
+                   <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
                  </template >
 
                  <el-table :data="[scope.row]">
@@ -396,7 +393,7 @@ const returnMyColorWin= ({row}) => {
                    trigger="hover"
                >
                  <template #reference>
-                   <img :src="scope.row.rankImage" style="width: 40px;height: 40px" alt="">
+                   <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
                  </template >
 
                  <el-table :data="[scope.row]">
@@ -453,8 +450,8 @@ const returnMyColorWin= ({row}) => {
           <el-table-column prop="championName" label="角色" width="160">
             <template v-slot="scope">
               <!--            通过读取本地-->
-              <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">
-              <img v-else :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+<!--              <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
+              <img  :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
               <!--            通过网络直接获取-->
               <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
               {{ scope.row.matchesListInfo.championName }}
@@ -519,7 +516,7 @@ const returnMyColorWin= ({row}) => {
                   trigger="hover"
               >
                 <template #reference>
-                  <img :src="scope.row.rankImage" style="width: 40px;height: 40px" alt="">
+                  <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
                 </template >
 
                 <el-table :data="[scope.row]">
@@ -639,7 +636,7 @@ const returnMyColorWin= ({row}) => {
                   trigger="hover"
               >
                 <template #reference>
-                  <img :src="scope.row.rankImage" style="width: 40px;height: 40px" alt="">
+                  <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
                 </template >
 
                 <el-table :data="[scope.row]">
@@ -698,8 +695,8 @@ const returnMyColorWin= ({row}) => {
             <el-table-column prop="championName" label="角色" width="160">
               <template v-slot="scope">
                 <!--            通过读取本地-->
-                <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">
-                <img v-else :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+<!--                <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
+                <img  :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
                 <!--            通过网络直接获取-->
                 <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
                 {{ scope.row.matchesListInfo.championName }}
@@ -764,7 +761,7 @@ const returnMyColorWin= ({row}) => {
                     trigger="hover"
                 >
                   <template #reference>
-                    <img :src="scope.row.rankImage" style="width: 40px;height: 40px" alt="">
+                    <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
                   </template >
 
                   <el-table :data="[scope.row]">

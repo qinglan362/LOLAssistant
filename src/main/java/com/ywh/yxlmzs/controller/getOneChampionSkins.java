@@ -73,28 +73,50 @@ public class getOneChampionSkins {
         }
         return skinFromChampionIdList;
     }
-    private String getImage(String path,Integer id) throws IOException {
-        if (!Files.exists(Paths.get(System.getProperty("user.dir")+"/images/skin/"+id + ".jpg"))) {
-            byte[] imageBytes = callApi.callApiGetImage(path,
-                    getGlobalTokenAndPort.getToken(),
-                    getGlobalTokenAndPort.getPort(),
-                    null);
-            String directoryPath = System.getProperty("user.dir")+"/images/skin/";
-            Files.createDirectories(Paths.get(directoryPath));
-            try (FileOutputStream fos = new FileOutputStream(directoryPath +id + ".jpg")) {
-                fos.write(imageBytes);
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            BufferedImage image = ImageIO.read(new File(directoryPath +id + ".jpg"));
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", baos);
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
-        }else{
-            BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/skin/"+id + ".jpg"));
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "jpg", baos);
-            return Base64.getEncoder().encodeToString(baos.toByteArray());
+//    private String getImage(String path,Integer id) throws IOException {
+//        if (!Files.exists(Paths.get(System.getProperty("user.dir")+"/images/skin/"+id + ".jpg"))) {
+//            byte[] imageBytes = callApi.callApiGetImage(path,
+//                    getGlobalTokenAndPort.getToken(),
+//                    getGlobalTokenAndPort.getPort(),
+//                    null);
+//            String directoryPath = System.getProperty("user.dir")+"/images/skin/";
+//            Files.createDirectories(Paths.get(directoryPath));
+//            try (FileOutputStream fos = new FileOutputStream(directoryPath +id + ".jpg")) {
+//                fos.write(imageBytes);
+//            }catch (IOException e){
+//                e.printStackTrace();
+//            }
+//            BufferedImage image = ImageIO.read(new File(directoryPath +id + ".jpg"));
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            ImageIO.write(image, "jpg", baos);
+//            return Base64.getEncoder().encodeToString(baos.toByteArray());
+//        }else{
+//            BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/skin/"+id + ".jpg"));
+//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//            ImageIO.write(image, "jpg", baos);
+//            return Base64.getEncoder().encodeToString(baos.toByteArray());
+//        }
+//    }
+private String getImage(String path, Integer id) throws IOException {
+    String filePath = System.getProperty("user.dir") + "/images/skin/" + id + ".jpg";
+
+    if (!Files.exists(Paths.get(filePath))) {
+        byte[] imageBytes = callApi.callApiGetImage(
+                path,
+                getGlobalTokenAndPort.getToken(),
+                getGlobalTokenAndPort.getPort(),
+                null);
+
+        String directoryPath = System.getProperty("user.dir") + "/images/skin/";
+        Files.createDirectories(Paths.get(directoryPath));
+
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(imageBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+    return "skin/"+id + ".jpg";
+}
 }

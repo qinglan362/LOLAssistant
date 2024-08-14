@@ -35,6 +35,23 @@ const returnMyColorMe=(row)=>{
 //获取某一局
 const oneMatchDetail=ref([]);
 const getOneMatch = (row) => {
+  console.log(row)
+  $.ajax({
+    url: "http://localhost:8089/TFTMatchOneDetail",
+    type: "GET",
+    data: {
+      currentPage: currentPage.value,
+      index: MatchesListInfo.value.indexOf(row),
+    },
+    success(resp) {
+      oneMatchDetail.value = resp;
+      console.log(oneMatchDetail);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp);
+    }
+  });
   oneMatchDetail.value=row.tftoneMatchDetail
   console.log(oneMatchDetail)
 };
@@ -67,7 +84,8 @@ const handleGameNameClick = (gameName) => {
 };
 //显示图片的base64编码
 const imageInfoSrc = (base64Image) => {
-  return `data:image/jpeg;base64,${base64Image}`;
+  return `http://localhost:8089/images/${base64Image}`;
+ // return `data:image/jpeg;base64,${base64Image}`;
 };
 //名次
 const returnPlacement=(val)=>{
@@ -164,7 +182,7 @@ const returnPlacement=(val)=>{
                   trigger="hover"
               >
                 <template #reference>
-                  <img :src="scope.row.rankImage" style="width: 40px;height: 40px" alt="">
+                  <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
                 </template >
 
                 <el-table :data="[scope.row.rank]">

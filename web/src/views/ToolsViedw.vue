@@ -308,7 +308,8 @@ const autoNextGame=()=>{
   });
 }
 const imageInfoSrc = (base64Image) => {
-  return `data:image/jpeg;base64,${base64Image}`;
+  return `http://localhost:8089/images/${base64Image}`;
+ // return `data:image/jpeg;base64,${base64Image}`;
 };
 //
 const checkName=ref('')

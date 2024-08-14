@@ -73,17 +73,7 @@ public class MatchesTFTFromPuuid {
                 )
         ).get("games");
 
-//         summary https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/loadouts/companions/
-//        System.out.println(objectMapper.readTree(
-//                callApi.callApiGet(
-//                        "/lol-game-data/assets/asse/companions-summary.json",
-//                        getGlobalTokenAndPort.getToken(),
-//                        getGlobalTokenAndPort.getPort(),
-//                        null
-//                )
-//        ).toPrettyString());
-
-         List<TFT> tfts=new ArrayList<>();
+        List<TFT> tfts=new ArrayList<>();
         for (JsonNode game:gamesJSON){
             JsonNode json=game.get("json");
             JsonNode tags=game.get("metadata").get("tags");
@@ -201,7 +191,11 @@ public class MatchesTFTFromPuuid {
                 if (currentSeasonRank.isEmpty()){
                     currentSeasonRank = "UNRANKED";
                 }
-                tftOneMatchDetail.setRankImage("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/"+currentSeasonRank.toLowerCase()+".png");
+                //网络获取
+                // tftOneMatchDetail.setRankImage("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/"+currentSeasonRank.toLowerCase()+".png");
+                //本地获取
+                tftOneMatchDetail.setRankImage("rank/"+currentSeasonRank.toLowerCase()+".png");
+
 
                 tftOneMatchDetails.add(tftOneMatchDetail);
             }
@@ -237,71 +231,58 @@ public class MatchesTFTFromPuuid {
 //        return tftMatchesListInfos;
 
     }
-    public String saveImage(String floderName,
-                            String id,
-                            String houzhui,
-                            String ImageUrl,
-                            String type,
-                            String style
-    ) throws IOException {
+public String saveImage(String folderName,
+                        String id,
+                        String extension,
+                        String imageUrl,
+                        String type,
+                        String style
+) throws IOException {
 
-        if (!Files.exists(Paths.get(System.getProperty("user.dir")+"/images/"+floderName+"/"+id+ "."+houzhui))) {
-            JsonNode typeImage  = objectMapper.readTree(
-                    callApi.callApiGet(
-                            ImageUrl,
-                            getGlobalTokenAndPort.getToken(),
-                            getGlobalTokenAndPort.getPort(),
-                            null
-                    )
-            );
-            String url="";
-            for (JsonNode ti : typeImage) {
-                if (type.equals("companion")) {
-                    if (ti.get("contentId").asText().equals(id)) {
-                        url=ti.get("loadoutsIcon").asText();
-                    }
-                }
-                if (type.equals("tftChampions")) {
-                    if (ti.get("character_record").get("character_id").asText().equals(id)) {
-                        url=ti.get("character_record").get("squareIconPath").asText();
-                    }
-                }
-                if (type.equals("tftitems")) {
-                    if (ti.get("nameId").asText().equals(id)) {
-                        url=ti.get("squareIconPath").asText();
-                    }
-                }
-                if (type.equals("tfttraits")) {
-                    if (ti.get("trait_id").asText().equals(id)) {
-                        url=ti.get("icon_path").asText();
-                    }
-                }
+    String filePath = System.getProperty("user.dir") + "/images/" + folderName + "/" + id + "." + extension;
+
+    if (!Files.exists(Paths.get(filePath))) {
+        JsonNode typeImage = objectMapper.readTree(
+                callApi.callApiGet(
+                        imageUrl,
+                        getGlobalTokenAndPort.getToken(),
+                        getGlobalTokenAndPort.getPort(),
+                        null
+                )
+        );
+
+        String url = "";
+        for (JsonNode ti : typeImage) {
+            if (type.equals("companion") && ti.get("contentId").asText().equals(id)) {
+                url = ti.get("loadoutsIcon").asText();
+            } else if (type.equals("tftChampions") && ti.get("character_record").get("character_id").asText().equals(id)) {
+                url = ti.get("character_record").get("squareIconPath").asText();
+            } else if (type.equals("tftitems") && ti.get("nameId").asText().equals(id)) {
+                url = ti.get("squareIconPath").asText();
+            } else if (type.equals("tfttraits") && ti.get("trait_id").asText().equals(id)) {
+                url = ti.get("icon_path").asText();
             }
-            byte[] imageBytes = callApi.callApiGetImage(
-                    url,
-                    getGlobalTokenAndPort.getToken(),
-                    getGlobalTokenAndPort.getPort(),
-                    null);
-            String directoryPath = System.getProperty("user.dir")+"/images/"+floderName+"/";
-            Files.createDirectories(Paths.get(directoryPath));
-            try (FileOutputStream fos = new FileOutputStream(directoryPath +id + "."+houzhui)) {
-                fos.write(imageBytes);
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-            BufferedImage image = ImageIO.read(new File(directoryPath +id + "."+houzhui));
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, houzhui, baos);
-            String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-            return  base64Image;
-        }else{
-            BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/"+floderName+"/"+id + "."+houzhui));
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, houzhui, baos);
-            String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-            return base64Image;
+        }
+
+        byte[] imageBytes = callApi.callApiGetImage(
+                url,
+                getGlobalTokenAndPort.getToken(),
+                getGlobalTokenAndPort.getPort(),
+                null);
+
+        String directoryPath = System.getProperty("user.dir") + "/images/" + folderName + "/";
+        Files.createDirectories(Paths.get(directoryPath));
+
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(imageBytes);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+    return folderName + "/" + id + "." + extension;
+}
+
     public String formatDate(String isoDate) {
         long time = Long.parseLong(isoDate);
         Instant instant = Instant.ofEpochMilli(time);
