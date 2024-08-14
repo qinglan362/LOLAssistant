@@ -15,4 +15,5 @@ public class TFTMatchesListInfo {
     private String placement;
     private String puuId;
     private List<String> tags;
+    private String name;
 }

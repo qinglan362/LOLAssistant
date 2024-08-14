@@ -42,9 +42,10 @@ const getOneMatch = (row) => {
     data: {
       currentPage: currentPage.value,
       index: MatchesListInfo.value.indexOf(row),
+      name:row.name
     },
     success(resp) {
-      oneMatchDetail.value = resp;
+      oneMatchDetail.value = resp.tftoneMatchDetail;
       console.log(oneMatchDetail);
     },
     error(resp) {
@@ -52,8 +53,6 @@ const getOneMatch = (row) => {
       ElMessage.error(resp);
     }
   });
-  oneMatchDetail.value=row.tftoneMatchDetail
-  console.log(oneMatchDetail)
 };
 //切换某页
 const currentPage=ref(1);
@@ -88,13 +87,13 @@ const imageInfoSrc = (base64Image) => {
  // return `data:image/jpeg;base64,${base64Image}`;
 };
 //名次
-const returnPlacement=(val)=>{
-  for (let i=0;i<val.length;i++){
-    if (val[i].gameName===name.value){
-      return val[i].placement
-    }
-  }
-}
+// const returnPlacement=(val)=>{
+//   for (let i=0;i<val.length;i++){
+//     if (val[i].gameName===name.value){
+//       return val[i].placement
+//     }
+//   }
+// }
 </script>
 
 <template>
@@ -112,7 +111,7 @@ const returnPlacement=(val)=>{
                 style="width: 100%">
         <el-table-column label="palcement" width="80">
           <template v-slot="scope">
-             第{{returnPlacement(scope.row.tftoneMatchDetail)}}名
+             第{{scope.row. placement}}名
           </template>
         </el-table-column>
         <el-table-column  label="gameMode" width="120">
