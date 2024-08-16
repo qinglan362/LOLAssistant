@@ -6,6 +6,7 @@ import jakarta.annotation.Resource;
 import kong.unirest.HttpResponse;
 import kong.unirest.JsonNode;
 import kong.unirest.Unirest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
@@ -14,13 +15,11 @@ import java.util.Map;
 @Service
 public class  CallApi {
 
-    @Resource
-    ObjectMapper objectMapper;
 
      public String callApiGet(String url, String token, String port, Map<String,Object> params) {
          String Auth="riot:"+token;
          String cmlvdD= Base64.getEncoder().encodeToString(Auth.getBytes());
-         HttpResponse<String> response = Unirest.get("https://127.0.0.1:"+port+url)
+         HttpResponse<String> response = Unirest.get("https://127.0.0.1:"+ port+url)
                  .queryString(params)
                  .header("Authorization", "Basic "+cmlvdD)
                  .asString();

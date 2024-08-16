@@ -16,7 +16,6 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Map;
 import java.util.Objects;
-import static java.lang.Thread.sleep;
 
 @Component
 public class ClientWebSocket extends TextWebSocketHandler {
@@ -53,7 +52,6 @@ public class ClientWebSocket extends TextWebSocketHandler {
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"));
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-gameflow_v1_gameflow-phase\"]"));
     }
-
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         CallApi callApi=new CallApi();

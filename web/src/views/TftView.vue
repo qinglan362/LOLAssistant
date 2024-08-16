@@ -12,7 +12,8 @@ const getInfo = () => {
     type: "GET",
     data: {
       name: name.value,
-      page: currentPage.value
+      page: currentPage.value,
+      type:chooseMoshi.value
     },
     success(resp) {
       MatchesListInfo.value = resp;
@@ -35,6 +36,7 @@ const returnMyColorMe=(row)=>{
 //获取某一局
 const oneMatchDetail=ref([]);
 const getOneMatch = (row) => {
+  oneMatchDetail.value = [];
   console.log(row)
   $.ajax({
     url: "http://localhost:8089/TFTMatchOneDetail",
@@ -94,16 +96,52 @@ const imageInfoSrc = (base64Image) => {
 //     }
 //   }
 // }
+const moshi = [
+  {
+    value: 'all',
+    label: '全部模式',
+  },
+  {
+    value: 'turbo',
+    label: '狂暴模式',
+  },
+  {
+    value: 'pairs',
+    label: '双人作战',
+  },
+  {
+    value: 'ranked',
+    label: '排位赛',
+  },
+  {
+    value: 'normal',
+    label: '匹配赛',
+  },
+]
+const  chooseMoshi=ref('全部')
 </script>
 
 <template>
   <div class="input-container">
     <el-input v-model="name" style="width: 150px" placeholder="请输入ID"></el-input>
+    <el-select
+        v-model="chooseMoshi"
+        placeholder="Select"
+        size="large"
+        style="width: 240px;margin-left: 20px"
+    >
+      <el-option
+          v-for="item in moshi"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+      />
+    </el-select>
     <el-button type="primary" @click="getInfo">获取该人云顶之弈战绩</el-button>
     <h4 style="margin-left: 50px">获取战绩可能有2-4秒延迟</h4>
   </div>
   <el-row style="margin-top: 10px">
-    <el-col :span="6">
+    <el-col :span="5">
       <el-table @row-click="getOneMatch"
                 row-style="background: linear-gradient(to right, rgb(206, 186, 226), rgb(229, 247, 252));"
                 :show-header="false"
@@ -128,7 +166,7 @@ const imageInfoSrc = (base64Image) => {
           :total="250" />
     </el-col>
 
-    <el-col :span="18">
+    <el-col :span="19">
 
         <el-table :data="oneMatchDetail"
                   :row-style="returnMyColorMe"
@@ -150,7 +188,7 @@ const imageInfoSrc = (base64Image) => {
               {{scope.row.level}}级
             </template>
           </el-table-column>
-          <el-table-column label="棋子" style="width: 500px; height: 70px;">
+          <el-table-column label="棋子" style="width: 700px; height: 70px;">
             <template v-slot="scope">
               <div style="display: flex; align-items: center; margin-bottom: 10px;" v-for="(unit, unitIndex) in scope.row.units" :key="unitIndex">
                 <img :src="imageInfoSrc(unit.unitImage)" alt="" style="width: 35px; height: 35px; margin-right: 10px;">

@@ -69,7 +69,7 @@ public class MatchOneTFTDetail {
                         map1
                 )
         ).get("games");
-
+        System.out.println(gamesJSON);
 
             JsonNode json=gamesJSON.get(0).get("json");
             JsonNode tags=gamesJSON.get(0).get("metadata").get("tags");
@@ -121,7 +121,7 @@ public class MatchOneTFTDetail {
                                         "png",
                                         "/lol-game-data/assets/v1/tftchampions.json",
                                         "tftChampions",
-                                          ""
+                                      ""
                              )
                      );
 

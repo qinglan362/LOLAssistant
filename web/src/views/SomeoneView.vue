@@ -49,12 +49,14 @@ const getBackgorundColor = ({row}) => {
       : 'background: linear-gradient(to right, rgb(235,165,165), white)';
 };
 
+const wujinkuangchao=ref([])
 const getOneMatch = (row) => {
   mapNameClick.value=row.mapName;
   initDouhun();
   TotalFirstToEighthTeam.value = [];
   OneMatchWin.value = [];
   OneMatchFail.value = [];
+  wujinkuangchao.value=[];
   $.ajax({
     url: "http://localhost:8089/MatchOneDetail",
     type: "GET",
@@ -63,7 +65,6 @@ const getOneMatch = (row) => {
     },
     success(resp) {
       resp.forEach((item) => {
-        console.log(item.subteamPlacement)
         if (item.subteamPlacement!=='0'){
            if (item.subteamPlacement === '1') {
             firstTeam.value.push(item);
@@ -84,15 +85,19 @@ const getOneMatch = (row) => {
             }
         }
         else{
-          if (item.matchesListInfo.win) {
-            OneMatchWin.value.push(item);
-          } else {
-            OneMatchFail.value.push(item);
+          if (item.matchesListInfo.mapName==='无尽狂潮'){
+             wujinkuangchao.value.push(item);
+          }else{
+            if (item.matchesListInfo.win) {
+              OneMatchWin.value.push(item);
+            } else {
+              OneMatchFail.value.push(item);
+            }
           }
         }
       });
       TotalFirstToEighthTeam.value.push(firstTeam.value,secondTeam.value,thirdTeam.value,fourthTeam.value,fifthTeam.value,sixthTeam.value,seventhTeam.value,eighthTeam.value);
-      console.log(OneMatchWin)
+      console.log(wujinkuangchao)
     },
     error(resp) {
       console.log(resp);
@@ -102,14 +107,13 @@ const getOneMatch = (row) => {
 };
 //
 const imageInfoSrc = (base64Image) => {
-  console.log(base64Image)
+
   return `http://localhost:8089/images/${base64Image}`;
 };
 
 //判断单独显示斗魂还是正常显示
 const  mapNameClick = ref()
 const showPerks=(mapName)=>{
-  console.log(mapName)
   if (mapName === "斗魂竞技场") {
     return "斗魂竞技场";
   }
@@ -164,6 +168,22 @@ const returnMyColorWin= ({row}) => {
     return 'background-color:rgb(220,242,245)'
   }else{
     return 'background-color:rgb(243,250,251)'
+  }
+}
+const returnTableColor=({row})=>{
+  console.log(row.matchesListInfo.win)
+  if (row.matchesListInfo.win===true){
+    if (row.gameName === name.value) {
+      return 'background-color:rgb(220,242,245)'
+    }else{
+      return 'background-color:rgb(243,250,251)'
+    }
+  }else{
+    if (row.gameName === name.value) {
+      return 'background-color:rgb(248,224,224)'
+    }else{
+      return 'background-color:rgb(252,241,241)'
+    }
   }
 }
 </script>
@@ -438,8 +458,8 @@ const returnMyColorWin= ({row}) => {
          </el-table>
        </div>
       <div v-if="showPerks(mapNameClick)==='无尽狂潮'">
-        <el-table :data="OneMatchWin"
-                  :row-style="returnMyColorWin"
+        <el-table :data="wujinkuangchao"
+                  :row-style="returnTableColor"
                   width="100%"
         >
           <el-table-column label="游戏昵称" width="170">
@@ -468,126 +488,6 @@ const returnMyColorWin= ({row}) => {
             </template>
           </el-table-column>
           <el-table-column  prop="champLevel" label="角色等级" width="80"/>
-          <el-table-column  label="KDA" width="120">
-            <template v-slot="scope">
-              <el-popover
-                  placement="top-start"
-                  :width="440"
-                  trigger="hover"
-              >
-                <template #reference>
-                  {{scope.row.kills}}-{{scope.row.deaths}}-{{scope.row.assists}}
-                </template >
-                <el-table :data="[scope.row]">
-                  <el-table-column  label="造成伤害" width="110">
-                    <template #default="{ row }">
-                      {{ row.totalDamageDealtToChampions}}
-                    </template>
-                  </el-table-column>
-                  <el-table-column  label="承受伤害" width="110">
-                    <template #default="{ row }">
-                      {{ row.totalDamageTaken}}
-                    </template>
-                  </el-table-column>
-                  <el-table-column  label="补兵数" width="110">
-                    <template #default="{ row }">
-                      {{ row.totalMinionsKilled}}
-                    </template>
-                  </el-table-column>
-                  <el-table-column  label="插眼" width="110">
-                    <template #default="{ row }">
-                      {{ row.wardsPlaced}}
-                    </template>
-                  </el-table-column>
-                </el-table>
-              </el-popover>
-            </template>
-          </el-table-column>
-          <el-table-column prop="" label="装备" width="300">
-            <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.itemsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
-            </template>
-          </el-table-column>
-          <el-table-column prop="" label="段位" width="150">
-            <template v-slot="scope">
-              <el-popover
-                  placement="top-start"
-                  :width="720"
-                  trigger="hover"
-              >
-                <template #reference>
-                  <img :src="imageInfoSrc(scope.row.rankImage)" style="width: 40px;height: 40px" alt="">
-                </template >
-
-                <el-table :data="[scope.row]">
-                  <el-table-column   label="单双排" width="350">
-                    <el-table-column  label="当前赛季最高段位" width="110">
-                      <template #default="{ row }">
-                        {{ row.rank.ranked_SOLO_5x5_CurrentSeason_HighestTier+row.rank.ranked_SOLO_5x5_CurrentSeason_HighestDivision}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column  label="当前段位" width="130">
-                      <template #default="{ row }">
-                        {{ row.rank.ranked_SOLO_5x5_CurrentSeason_Tier+row.rank.ranked_SOLO_5x5_CurrentSeason_Division+"  "+row.rank.ranked_SOLO_5x5_CurrentSeason_LeaguePoints}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="历史最高段位" width="110">
-                      <template #default="{ row }">
-                        {{ row.rank.ranked_SOLO_5x5_PreviousSeasonHighestTier}}
-                      </template>
-                    </el-table-column>
-                  </el-table-column>
-                  <el-table-column label="灵活组排" width="350">
-                    <el-table-column  label="当前赛季最高段位" width="110">
-                      <template #default="{ row }">
-                        {{ row.rank.ranked_FLEX_SR_CurrentSeason_HighestTier+row.rank.ranked_FLEX_SR_CurrentSeason_HighestDivision}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column  label="当前段位" width="130">
-                      <template #default="{ row }">
-                        {{ row.rank.ranked_FLEX_SR_CurrentSeason_Tier+row.rank.ranked_FLEX_SR_CurrentSeason_Division+"  "+row.rank.ranked_FLEX_SR_CurrentSeason_LeaguePoints}}
-                      </template>
-                    </el-table-column>
-                    <el-table-column label="历史最高段位" width="110">
-                      <template #default="{ row }">
-                        {{ row.rank.ranked_FLEX_SR_PreviousSeasonHighestTier}}
-                      </template>
-                    </el-table-column>
-                  </el-table-column>
-                </el-table>
-              </el-popover>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-table :data="OneMatchFail"
-                  :row-style="returnMyColorFail"
-                  width="100%"
-        >
-          <el-table-column label="游戏昵称" width="160">
-            <template #default="scope">
-              <el-link @click="handleGameNameClick(scope.row.gameName)">{{ scope.row.gameName }}</el-link>
-            </template>
-          </el-table-column>
-          <el-table-column prop="championName" label="角色" width="160">
-            <template v-slot="scope">
-              <!--            通过读取本地-->
-              <img :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
-              <!--            通过网络直接获取-->
-              <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
-              {{ scope.row.matchesListInfo.championName }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="" label="选择特性" width="300">
-            <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.augments"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
-            </template>
-          </el-table-column>
-          <el-table-column  label="召唤师技能" width="100">
-            <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.spellsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
-            </template>
-          </el-table-column>
-          <el-table-column prop="champLevel" label="角色等级" width="80"/>
           <el-table-column  label="KDA" width="120">
             <template v-slot="scope">
               <el-popover

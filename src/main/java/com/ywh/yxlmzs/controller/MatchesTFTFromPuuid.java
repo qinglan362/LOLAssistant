@@ -1,5 +1,6 @@
 package com.ywh.yxlmzs.controller;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,17 +48,25 @@ public class MatchesTFTFromPuuid {
 
         int begIndex=(page-1)*18;
 
+
+//        List<String> tagsParams =new ArrayList<>();
+//        tagsParams.add("ranked");
+//        tagsParams.add("pairs");
+//        tagsParams.add("TFTSet12");
+
         //tag也可以作为参数
-        Map<String, Object> map1 = Map.of("begin", begIndex, "count", 18);
+        Map<String, Object> param ;
+        param = Map.of("begin", begIndex, "count", 18);
 
         JSONObject jsonObject = JSONObject.parseObject(getSummoners.getSummoners(Map.of("name",map.get("name"))));
         String puuId = jsonObject.getString("puuid");
+
         JsonNode gamesJSON=objectMapper.readTree(
                 callApi.callApiGet(
                         "/lol-match-history/v1/products/tft/"+puuId+"/matches",
                         getGlobalTokenAndPort.getToken(),
                         getGlobalTokenAndPort.getPort(),
-                        map1
+                        param
                 )
         ).get("games");
 
