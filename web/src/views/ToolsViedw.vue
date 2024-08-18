@@ -1180,6 +1180,24 @@ const watch=()=>{
     }
   });
 }
+//自动交换位置
+const setutoSwap=()=>{
+  store.state.autoSwap=!store.state.autoSwap
+  $.ajax({
+    url: "http://localhost:8089/autoSwap",
+    type: "Post",
+    data: {
+      state: store.state.autoSwap
+    },
+    success(resp) {
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
 </script>
 
 <template>
@@ -1303,7 +1321,7 @@ const watch=()=>{
           <el-button @click="ban" type="primary" round>确定</el-button>
         </el-dialog>
       </div>
-        <div style="margin-top: 20px">
+      <div style="margin-top: 20px">
           <el-button type="primary" @click="dialogTableVisible2=true">修改生涯图片背景(可选择没有的皮肤)</el-button>
           <el-dialog v-model="dialogTableVisible2" title="选择英雄" width="300">
             <el-select
@@ -1354,6 +1372,10 @@ const watch=()=>{
             </div>
           </el-dialog>
         </div>
+      <div style="margin-top: 20px">
+        <el-button  v-if="store.state.autoSwap===false" type="primary" @click="setutoSwap">自动交换位置</el-button>
+        <el-button v-if="store.state.autoSwap===true" @click="setutoSwap" type="danger" round>取消自动交换位置</el-button>
+      </div>
     </el-col>
     <el-col :span="6">
       <div>

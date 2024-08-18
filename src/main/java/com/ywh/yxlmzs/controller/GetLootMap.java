@@ -155,7 +155,6 @@ public class GetLootMap {
                     }
                 }
                 case "emote" -> {
-                    //图标
                     if (node.get("displayCategories").asText().equals("EMOTE")) {
                         recipes recipes = new recipes();
                         recipes.setStoreItemId(node.get("storeItemId").asText());
@@ -177,7 +176,6 @@ public class GetLootMap {
                 }
                 //猜测的小小英雄  待完善 完善
                 case "companion" -> {
-                    //图标
                     if (node.get("displayCategories").asText().equals("COMPANION")) {
                         recipes recipes = new recipes();
                         recipes.setStoreItemId(node.get("storeItemId").asText());

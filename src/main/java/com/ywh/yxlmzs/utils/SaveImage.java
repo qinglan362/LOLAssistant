@@ -128,7 +128,7 @@ public class SaveImage {
                 if (ti.get("id").asInt() == Integer.parseInt(fileName)) {
                     if (type.equals("champion-summary")) {
                         url = ti.get("squarePortraitPath").asText();
-                    } else if (type.equals("items") || type.equals("summoner-spells") || type.equals("perks")) {
+                    } else if (type.equals("items") || type.equals("summoner-spells") || type.equals("perks")||type.equals("profile-icons")) {
                         url = ti.get("iconPath").asText();
                     } else if (type.equals("cherry-augments")) {
                         url = ti.get("augmentSmallIconPath").asText();

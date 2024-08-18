@@ -13,4 +13,6 @@ public class MatchesListInfo {
     private String championName;
     private String date;
     private String mapName;
+    //斗魂竞技场名次
+    private String placement;
 }

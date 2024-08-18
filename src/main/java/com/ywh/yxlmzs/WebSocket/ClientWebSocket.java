@@ -29,6 +29,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
     private AutoAccecptMatch autoAccecptMatch;
     private AutoSearchMatch autoSearchMatch;
     private String state;
+    private AutoSwap autoSwap;
 
     @Autowired
     public ClientWebSocket(GetGlobalTokenAndPort getGlobalTokenAndPort,
@@ -36,7 +37,8 @@ public class ClientWebSocket extends TextWebSocketHandler {
                            BanChampionId banChampionId,
                            AutoContinueNextGame autoContinueNextGame,
                            AutoAccecptMatch autoAccecptMatch,
-                           AutoSearchMatch autoSearchMatch
+                           AutoSearchMatch autoSearchMatch,
+                           AutoSwap autoSwap
                            ) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.pickChampionId=pickChampionId;
@@ -44,6 +46,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
         this.autoContinueNextGame=autoContinueNextGame;
         this.autoAccecptMatch=autoAccecptMatch;
         this.autoSearchMatch=autoSearchMatch;
+        this.autoSwap=autoSwap;
     }
 
     @Override
@@ -52,12 +55,15 @@ public class ClientWebSocket extends TextWebSocketHandler {
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"));
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-gameflow_v1_gameflow-phase\"]"));
     }
+    ///lol-champ-select/v1/session/trades/{id}/accept
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         CallApi callApi=new CallApi();
         ObjectMapper objectMapper = new ObjectMapper();
         String  port=getGlobalTokenAndPort.getPort();
         String  token=getGlobalTokenAndPort.getToken();
+
+
 
        if (message.getPayload().contains("/lol-gameflow/v1/gameflow-phase")) {
 
@@ -108,7 +114,35 @@ public class ClientWebSocket extends TextWebSocketHandler {
            }
            if (message.getPayload().contains("ChampSelect")) {
                while (state.equals("ChampSelect")) {
-                 //  sleep(1000);
+
+                   if (!Objects.isNull(autoSwap)){
+                       if (!Objects.isNull(autoSwap.getState())&&!autoSwap.getState().isEmpty()){
+                           if (autoSwap.getState().equals("true")){
+                               JsonNode jsonNodeAccecptSwap = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
+                               if (!jsonNodeAccecptSwap.get("pickOrderSwaps").isEmpty()){
+                                   for (JsonNode jsonNode:jsonNodeAccecptSwap.get("pickOrderSwaps")){
+                                       if (jsonNode.get("state").asText().equals("RECEIVED")){
+                                           //还不好用
+                                           System.out.println(callApi.callApiPost(
+                                                   "/lol-champ-select/v1/session/trades/"+jsonNode.get("id").asInt()+"/accept",
+                                                   token,
+                                                   port,
+                                                   null
+                                           ));
+                                           System.out.println(callApi.callApiPost(
+                                                   "/lol-champ-select/v1/session/trades/"+jsonNode.get("cellId").asInt()+"/accept",
+                                                   token,
+                                                   port,
+                                                   null
+                                           ));
+                                       }
+                                   }
+                               }
+                           }
+                       }
+                   }
+
+                   //  sleep(1000);
                    if ((!Objects.isNull(pickChampionId.getState()) && pickChampionId.getState().equals("start")) ||( !Objects.isNull(banChampionId.getState())&&banChampionId.getState().equals("start"))) {
                        JsonNode jsonNode = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
                        if (!Objects.isNull(jsonNode.get("message")) &&(jsonNode.get("message").asText().equals("No active delegate")||jsonNode.get("errorCode").asText().equals("RPC_ERROR"))){
@@ -166,21 +200,23 @@ public class ClientWebSocket extends TextWebSocketHandler {
 
            }
            if (message.getPayload().contains("PreEndOfGame")) {
-               if (!Objects.isNull(autoContinueNextGame)&&autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
-                   String Url1 = "/lol-honor-v2/v1/honor-player";
-                   Map<String,Object> param=Map.of("honorCategory","");
-                   callApi.callApiPost(Url1, token, port, param);
-                   System.out.println("游戏结束,荣誉加一");
+               if (!Objects.isNull(autoContinueNextGame)&&!Objects.isNull(autoContinueNextGame.getAutoContinueNextGame())&&!autoContinueNextGame.getAutoContinueNextGame().isEmpty()) {
+                   if (autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
+                       String Url1 = "/lol-honor-v2/v1/honor-player";
+                       Map<String,Object> param=Map.of("honorCategory","");
+                       callApi.callApiPost(Url1, token, port, param);
+                       System.out.println("游戏结束,荣誉加一");
+                   }
                }
            }
            if (message.getPayload().contains("EndOfGame")){
-
-               if (!Objects.isNull(autoContinueNextGame)&&autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
-                   String Url= "/lol-lobby/v2/play-again";
-                   callApi.callApiPost(Url,token,port,null);
+               if (!Objects.isNull(autoContinueNextGame)&&!Objects.isNull(autoContinueNextGame.getAutoContinueNextGame())&&!autoContinueNextGame.getAutoContinueNextGame().isEmpty()) {
+                   if (autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
+                       String Url= "/lol-lobby/v2/play-again";
+                       callApi.callApiPost(Url,token,port,null);
+                   }
                }
            }
-
        }
     }
 

@@ -1,5 +1,6 @@
 package com.ywh.yxlmzs.utils;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.mapsInfo;
 import jakarta.annotation.Resource;
@@ -41,16 +42,18 @@ public class GetMaps {
             List<mapsInfo> mapInfoList = new ArrayList<>();
             for (JsonNode node : rootNode) {
                 String availability = node.get("queueAvailability").asText();
-                if ("Available".equals(availability)) {
+//                if ("Available".equals(availability)) {
                     String name = node.get("name").asText();
                     String mapId = node.get("mapId").asText();
                     String id = node.get("id").asText();
                     String gameMode = node.get("gameMode").asText();
                     mapsInfo mapInfo = new mapsInfo(name, mapId, id, gameMode);
                     mapInfoList.add(mapInfo);
-                }
+//                }
             }
             allMaps.setList(mapInfoList);
+           //mapInfoList变成json字符串
+
         } catch (Exception e) {
             e.printStackTrace();
         }

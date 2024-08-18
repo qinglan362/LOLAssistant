@@ -42,7 +42,6 @@ public class MatchesListFromPuuid {
         this.allMaps = allMaps;
     }
 
-
     @GetMapping("/matchesFromPuuid")
     public List<MatchesListInfo> MatchesFromPuuid(@RequestParam Map<String, Object> map) throws IOException {
 
@@ -62,26 +61,37 @@ public class MatchesListFromPuuid {
 
         JsonNode games = objectMapper.readTree(callApi.callApiGet(url, token, port, map1)).get("games").get("games");
 
+        System.out.println(games.toPrettyString());
 
         List<MatchesListInfo> matchesListInfos = new ArrayList<>();
         for (JsonNode game : games) {
-            String mapId = game.get("mapId").asText();
-            if (
-                    Objects.equals(game.get("mapId").asText(), "11") ||
-                    Objects.equals(game.get("mapId").asText(),"30") ||
-                    Objects.equals(game.get("mapId").asText(), "12")||
-                    Objects.equals(game.get("mapId").asText(), "33")
-            ) {
+//            if (
+//                    Objects.equals(game.get("mapId").asText(), "11") ||
+//                    Objects.equals(game.get("mapId").asText(),"30") ||
+//                    Objects.equals(game.get("mapId").asText(), "12")||
+//                    Objects.equals(game.get("mapId").asText(), "33")
+//            ) {
+                String id;
+                String type;
+                if (!Objects.equals(game.get("queueId").asText(), "0")) {
+                    id = game.get("queueId").asText();
+                    type="queueId";
+                } else {
+                    id = game.get("mapId").asText();
+                    type="mapId";
+                }
+
                 matchesListInfos.add(
                         new MatchesListInfo(
                                 game.get("gameId").asText(),
                                 game.get("participants").get(0).get("stats").get("win").asBoolean(),
                                 getChampionNameById(game.get("participants").get(0).get("championId").asInt()),
                                 formatDate(game.get("gameCreationDate").asText()),
-                                getGameMapNameById(game.get("mapId").asText())
+                                getGameMapNameById(id,type),
+                                game.get("participants").get(0).get("stats").get("subteamPlacement").asText()
                         )
                 );
-            }
+//            }
         }
 
         return matchesListInfos;
@@ -90,8 +100,13 @@ public class MatchesListFromPuuid {
       public String getChampionNameById(Integer id) {
           return allChampions.getList().stream().filter(champion -> champion.getKey().equals(id)).findFirst().get().getName();
       }
-      public String getGameMapNameById(String mapId) {
-          return allMaps.getList().stream().filter(map -> map.getMapId().equals(mapId)).findFirst().get().getName();
+      public String getGameMapNameById(String id,String type) {
+
+        if (type.equals("queueId")) {
+            return allMaps.getList().stream().filter(map -> map.getId().equals(id)).findFirst().get().getName();
+        }else{
+            return allMaps.getList().stream().filter(map -> map.getMapId().equals(id)).findFirst().get().getName();
+        }
       }
      public String formatDate(String isoDate) {
         Instant instant = Instant.parse(isoDate);

@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class MatchOneDetail {
@@ -55,6 +56,8 @@ public class MatchOneDetail {
                 null
          ));
 
+
+
         List<OneMatchDetail> oneMatchDetails = new ArrayList<>();
         JsonNode participants = OneMatchDetails.get("participants");
         JsonNode participantIdentities = OneMatchDetails.get("participantIdentities");
@@ -66,7 +69,16 @@ public class MatchOneDetail {
             MatchesListInfo matchRecord = new MatchesListInfo();
             matchRecord.setGameId(gameId);
             matchRecord.setDate(formatDate(OneMatchDetails.get("gameCreationDate").asText()));
-            matchRecord.setMapName(getGameMapNameById(OneMatchDetails.get("mapId").asText()));
+            String id;
+            String type;
+            if (Objects.equals(OneMatchDetails.get("queueId").asText(), "0")){
+                id=OneMatchDetails.get("mapId").asText();
+                type="mapId";
+            }else{
+                id=OneMatchDetails.get("queueId").asText();
+                type="queueId";
+            }
+            matchRecord.setMapName(getGameMapNameById(id,type));
             matchRecord.setWin(participants.get(i).get("stats").get("win").asBoolean());
             matchRecord.setChampionName(getChampionNameById(participants.get(i).get("championId").asInt()));
             oneMatchDetail.setMatchesListInfo(matchRecord);
@@ -113,9 +125,7 @@ public class MatchOneDetail {
             oneMatchDetail.setSpellsImage(spellImage);
 
 
-
-
-            if (currentSeasonRank.equals("")){
+            if (currentSeasonRank.isEmpty()){
                 currentSeasonRank = "UNRANKED";
              }
             oneMatchDetail.setRankImage("rank/"+currentSeasonRank.toLowerCase()+".png");
@@ -171,8 +181,12 @@ public class MatchOneDetail {
     public String getChampionNameById(Integer id) {
         return allChampions.getList().stream().filter(champion -> champion.getKey().equals(id)).findFirst().get().getName();
     }
-    public String getGameMapNameById(String mapId) {
-        return allMaps.getList().stream().filter(map -> map.getMapId().equals(mapId)).findFirst().get().getName();
+    public String getGameMapNameById(String id,String type) {
+        if (type.equals("queueId")) {
+            return  allMaps.getList().stream().filter(map -> map.getId().equals(id)).findFirst().get().getName();
+        }else{
+            return  allMaps.getList().stream().filter(map -> map.getMapId().equals(id)).findFirst().get().getName();
+        }
     }
     public String formatDate(String isoDate) {
         Instant instant = Instant.parse(isoDate);
