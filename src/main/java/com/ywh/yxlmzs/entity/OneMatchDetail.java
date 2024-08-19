@@ -30,4 +30,6 @@ public class OneMatchDetail {
     private String subteamPlacement;
     //斗魂竞技场海克斯
     private List<String> augments;
+    //斗魂竞技场分数
+    private String ratedRating;
 }

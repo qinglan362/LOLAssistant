@@ -61,7 +61,6 @@ public class MatchesListFromPuuid {
 
         JsonNode games = objectMapper.readTree(callApi.callApiGet(url, token, port, map1)).get("games").get("games");
 
-        System.out.println(games.toPrettyString());
 
         List<MatchesListInfo> matchesListInfos = new ArrayList<>();
         for (JsonNode game : games) {

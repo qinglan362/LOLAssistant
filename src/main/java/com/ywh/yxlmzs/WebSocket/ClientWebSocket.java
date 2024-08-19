@@ -2,6 +2,7 @@ package com.ywh.yxlmzs.WebSocket;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -93,13 +94,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
                                if (jsonNode.get("gameConfig").get("showPositionSelector").asText().equals("true")){
                                    Map<String,Object> map=Map.of("firstPreference",autoSearchMatch.getFirstPosition(),"secondPreference",autoSearchMatch.getSecondPosition());
                                    callApi.callApiPut("/lol-lobby/v2/lobby/members/localMember/position-preferences",token,port,map);
-                                   callApi.callApiPost("/lol-lobby/v2/lobby/matchmaking/search",token,port,null);
-                                   System.out.println("开始匹配");
-                                   break;
-                               }else{
-                                   callApi.callApiPost("/lol-lobby/v2/lobby/matchmaking/search",token,port,null);
-                                   System.out.println("开始匹配");
                                }
+                               matchMacking();
+                               break;
                            }
                        }
                    }
@@ -114,6 +111,12 @@ public class ClientWebSocket extends TextWebSocketHandler {
            }
            if (message.getPayload().contains("ChampSelect")) {
                while (state.equals("ChampSelect")) {
+
+                   if ((Objects.isNull(autoSwap)||Objects.isNull(autoSwap.getState())||autoSwap.getState().isEmpty()||autoSwap.getState().equals("false"))
+                           &&(Objects.isNull(pickChampionId)||Objects.isNull(pickChampionId.getState())||pickChampionId.getState().isEmpty()||pickChampionId.getState().equals("stop"))
+                           &&(Objects.isNull(banChampionId)||Objects.isNull(banChampionId.getState())||banChampionId.getState().isEmpty()||banChampionId.getState().equals("stop"))){
+                       break;
+                   }
 
                    if (!Objects.isNull(autoSwap)){
                        if (!Objects.isNull(autoSwap.getState())&&!autoSwap.getState().isEmpty()){
@@ -142,7 +145,6 @@ public class ClientWebSocket extends TextWebSocketHandler {
                        }
                    }
 
-                   //  sleep(1000);
                    if ((!Objects.isNull(pickChampionId.getState()) && pickChampionId.getState().equals("start")) ||( !Objects.isNull(banChampionId.getState())&&banChampionId.getState().equals("start"))) {
                        JsonNode jsonNode = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
                        if (!Objects.isNull(jsonNode.get("message")) &&(jsonNode.get("message").asText().equals("No active delegate")||jsonNode.get("errorCode").asText().equals("RPC_ERROR"))){
@@ -197,7 +199,6 @@ public class ClientWebSocket extends TextWebSocketHandler {
                }
            }
            if (message.getPayload().contains("InProgress")) {
-
            }
            if (message.getPayload().contains("PreEndOfGame")) {
                if (!Objects.isNull(autoContinueNextGame)&&!Objects.isNull(autoContinueNextGame.getAutoContinueNextGame())&&!autoContinueNextGame.getAutoContinueNextGame().isEmpty()) {
@@ -236,5 +237,19 @@ public class ClientWebSocket extends TextWebSocketHandler {
         session.sendMessage(new TextMessage(unsubscribeMessage));
         System.out.println("取消订阅成功: " + unsubscribeMessage);
     }
-
+    public boolean matchMacking( ) throws JsonProcessingException {
+        // 发送消息
+        System.out.println("dasdasdasdasdasdas");
+        CallApi callApi=new CallApi();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String  port=getGlobalTokenAndPort.getPort();
+        String  token=getGlobalTokenAndPort.getToken();
+        JsonNode jsonNode=objectMapper.readTree(callApi.callApiPost("/lol-lobby/v2/lobby/matchmaking/search",token,port,null));
+        if (!Objects.isNull(jsonNode.get("message"))){
+            if (!jsonNode.get("message").asText().isEmpty()){
+                return jsonNode.get("message").asText().equals("GATEKEEPER_RESTRICTED");
+            }
+        }
+        return true;
+    }
 }

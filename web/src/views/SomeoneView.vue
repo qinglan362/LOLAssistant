@@ -592,6 +592,8 @@ const returnTableColor=({row})=>{
                 <el-link @click="handleGameNameClick(scope.row.gameName)">{{ scope.row.gameName }}</el-link>
               </template>
             </el-table-column>
+          <el-table-column prop="ratedRating" label="分数" width="70">
+          </el-table-column>
             <el-table-column prop="championName" label="角色" width="160">
               <template v-slot="scope">
                 <!--            通过读取本地-->

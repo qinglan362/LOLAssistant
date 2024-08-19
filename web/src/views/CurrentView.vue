@@ -12,11 +12,11 @@ const getData = () => {
     type: "GET",
     success(resp) {
         All.value=resp;
-      console.log(resp);
+       console.log(resp);
     },
     error(resp) {
       console.log(resp);
-      ElMessage.error(resp.msg);
+      ElMessage.error("不在选人界面，没有数据");
     }
   });
 };
@@ -54,8 +54,9 @@ const getBackgorundColor = ({row}) => {
             src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
             alt=""/>
       </el-avatar>
+      斗魂分数：{{item.rate}}
       <el-table :row-style="getBackgorundColor" :show-header="false" :data="item.matchRecords" style="width: 100%">
-          <el-table-column prop="championName" label="角色" width="60" />
+          <el-table-column prop="championName" label="角色" width="120" />
           <el-table-column  label="" width="60">
             <template #default="scope">
               <img
@@ -65,14 +66,13 @@ const getBackgorundColor = ({row}) => {
                   alt=""/>
             </template>
           </el-table-column>
-        <el-table-column prop="mapName" label="模式"  width="75"/>
-        <el-table-column  label="K/D/A"  width="50">
+        <el-table-column prop="mapName" label="模式"  width="100"/>
+        <el-table-column  label="K/D/A"  width="100">
           <template #default="scope">
             {{scope.row.kills}}/{{scope.row.deaths}}/{{scope.row.assists}}
           </template>
         </el-table-column>
-        <el-table-column prop="date" label="日期"  width="75"/>
-        <el-table-column   width="50">
+        <el-table-column   width="65">
           <template #default="scope">
             {{winOrFalse(scope.row.win)}}
           </template>

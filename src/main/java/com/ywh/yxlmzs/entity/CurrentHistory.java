@@ -15,4 +15,6 @@ public class CurrentHistory {
     private String rank;
     private String name;
     private String icon;
+    //斗魂竞技场分数
+    private String rate;
 }

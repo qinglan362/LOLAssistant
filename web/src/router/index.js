@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ZhanJi from '../views/ZhanJi.vue'
 import TftView from "@/views/TftView.vue";
+import EnemyView from "@/views/EnemyView.vue";
 const routes = [
   {
     path: '/ZhanJi',
@@ -11,6 +12,11 @@ const routes = [
     path: '/someoneTft',
     name: 'someoneTft',
     component: TftView
+  },
+  {
+    path: '/currentEnemy',
+    name: 'currentEnemy',
+    component: EnemyView
   },
   {
     path: '/gongju',

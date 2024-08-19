@@ -1,5 +1,6 @@
 package com.ywh.yxlmzs.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.Champion;
@@ -20,46 +21,66 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @RestController
-public class GetCurrentGameSummonersId {
+public class GetEnemy {
 
+    @Resource
+    ObjectMapper objectMapper;
     @Resource
     CallApi callApi;
     @Resource
-    GetGameFromGameId getGameFromGameId;
-    @Resource
     SaveImage saveImage;
+    @Resource
+    GetGameFromGameId getGameFromGameId;
 
-    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
-    private final AllChampions allChampions;
-    private final AllMaps allMaps;
+    private GetGlobalTokenAndPort getGlobalTokenAndPort;
+    private  AllChampions allChampions;
+    private  AllMaps allMaps;
+
     @Autowired
-    public GetCurrentGameSummonersId(GetGlobalTokenAndPort getGlobalTokenAndPort, AllChampions allChampions, AllMaps allMaps) {
+    public GetEnemy(GetGlobalTokenAndPort getGlobalTokenAndPort, AllChampions allChampions, AllMaps allMaps) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.allChampions = allChampions;
         this.allMaps = allMaps;
     }
-    @GetMapping("/getCurrentGameSummonersId")
-    public List<CurrentHistory> getCurrentGameSummonersId() throws IOException {
-        List<String> puuids=new ArrayList<>();
-        String url="/lol-champ-select/v1/session";
-        String port=getGlobalTokenAndPort.getPort();
-        String token=getGlobalTokenAndPort.getToken();
-        String result=callApi.callApiGet(url,token,port,null);
-        ObjectMapper objectMapper = new ObjectMapper();
 
-        JsonNode rootNode = objectMapper.readTree(result);
+    @GetMapping("/getEnemy")
+    public List<CurrentHistory> getEnemy() throws IOException {
+        String port = getGlobalTokenAndPort.getPort();
+        String token = getGlobalTokenAndPort.getToken();
 
-        JsonNode myTeam=rootNode.get("myTeam");
+        JsonNode gameData=objectMapper.readTree(
+                callApi.callApiGet(
+                        "/lol-gameflow/v1/session",
+                        token,
+                        port,
+                        null
+                )
+        ).get("gameData");
 
-       String myselfPuuid=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v1/current-summoner",token,port,null)).get("puuid").asText();
+        System.out.println(gameData);
 
-        if (myTeam.isArray()) {
-            for (JsonNode summonerNode : myTeam) {
-                if (!Objects.equals(summonerNode.get("puuid").asText(), "")) {
-                    if (!Objects.equals(summonerNode.get("puuid").asText(), myselfPuuid)){
-                        puuids.add(summonerNode.get("puuid").asText());
-                    }
-                }
+        JsonNode enemyTea=null;
+        String myPuuId=objectMapper.readTree(
+                callApi.callApiGet(
+                        "/lol-summoner/v1/current-summoner",
+                        token,
+                        port,
+                        null
+                )
+        ).get("puuid").asText();
+
+        for (JsonNode team:gameData.get("teamOne")){
+             if (team.get("puuid").asText().equals(myPuuId)){
+                 enemyTea=gameData.get("teamTwo");
+                 break;
+             }
+             enemyTea=gameData.get("teamOne");
+        }
+        //取出敌方队伍的puuid
+        List<String> enemyPuuIds=new ArrayList<>();
+        if (enemyTea != null) {
+            for (JsonNode enemy:enemyTea){
+                enemyPuuIds.add(enemy.get("puuid").asText());
             }
         }
 
@@ -67,7 +88,7 @@ public class GetCurrentGameSummonersId {
 
         List<CurrentHistory> AllMyTeamMatchRecords = new ArrayList<>();
 
-        for (String puuid : puuids) {
+        for (String puuid : enemyPuuIds) {
 
             CurrentHistory currentHistory = new CurrentHistory();
             JsonNode current=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v2/summoners/puuid/"+puuid,token,port,null));
@@ -81,9 +102,9 @@ public class GetCurrentGameSummonersId {
                     null
             )).get("queueMap").get("RANKED_SOLO_5x5").get("tier").asText();
             if (tier.isEmpty()) {
-                 tier="unranked";
+                tier="unranked";
             }
-           //斗魂竞技场分数
+            //斗魂竞技场分数
             JsonNode rankNode = objectMapper.readTree(callApi.callApiGet("/lol-ranked/v1/ranked-stats/" + puuid, getGlobalTokenAndPort.getToken(), getGlobalTokenAndPort.getPort(), null)).get("queueMap");
             currentHistory.setRate(rankNode.get("CHERRY").get("ratedRating").asText());
 
@@ -102,9 +123,9 @@ public class GetCurrentGameSummonersId {
             Map<String,String> gameMode=new HashMap<>();
             Map<String,String> gameDeatils=getMapNameById();
             for (JsonNode game : games) {
-                    gameIds.add(game.get("gameId").asText());
-                    gameDate.put(game.get("gameId").asText(),formateDate(game.get("gameCreationDate").asText()));
-                    gameMode.put(game.get("gameId").asText(),gameDeatils.get(game.get("queueId").asText()));
+                gameIds.add(game.get("gameId").asText());
+                gameDate.put(game.get("gameId").asText(),formateDate(game.get("gameCreationDate").asText()));
+                gameMode.put(game.get("gameId").asText(),gameDeatils.get(game.get("queueId").asText()));
             }
             for (String gameId : gameIds) {
                 JsonNode gameDetail = objectMapper.readTree(getGameFromGameId.getGameFromGameId(gameId));
@@ -116,7 +137,7 @@ public class GetCurrentGameSummonersId {
                             MatchRecord matchRecord = new MatchRecord();
                             matchRecord.setChampionIcon(
                                     saveImage.saveImage("championSummary",
-                                             participants.get(i).get(j).get("championId").asText(),
+                                            participants.get(i).get(j).get("championId").asText(),
                                             "png",
                                             "champion-summary")
                             );
@@ -141,11 +162,14 @@ public class GetCurrentGameSummonersId {
             AllMyTeamMatchRecords.add(currentHistory);
         }
         return AllMyTeamMatchRecords;
+
     }
 
     public String formateDate(String isoDate){
         Instant instant = Instant.parse(isoDate);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
+        //只显示年月日
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDate = zonedDateTime.format(formatter);
         return formattedDate;
@@ -165,5 +189,4 @@ public class GetCurrentGameSummonersId {
         }
         return maps;
     }
-
 }

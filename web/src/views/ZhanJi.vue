@@ -17,7 +17,13 @@
 
   <router-link :to="{name:'current'}">
     <el-button  type="primary" style="margin-left: 100px" >
-      获取当前队友战绩
+      获取当前游戏队友战绩
+    </el-button>
+  </router-link>
+
+  <router-link :to="{name:'currentEnemy'}">
+    <el-button  type="primary" style="margin-left: 100px" >
+      获取当前游戏对手战绩
     </el-button>
   </router-link>
 

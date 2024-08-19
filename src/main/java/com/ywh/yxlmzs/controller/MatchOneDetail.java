@@ -64,7 +64,9 @@ public class MatchOneDetail {
         for (int i = 0; i < participants.size(); i++) {
 
             OneMatchDetail oneMatchDetail = new OneMatchDetail();
-            Rank rank = rank(participantIdentities.get(i).get("player").get("puuid").asText());
+            String puuId=participantIdentities.get(i).get("player").get("puuid").asText();
+            JsonNode rankNode = objectMapper.readTree(callApi.callApiGet("/lol-ranked/v1/ranked-stats/" + puuId, getGlobalTokenAndPort.getToken(), getGlobalTokenAndPort.getPort(), null)).get("queueMap");
+            Rank rank = rank(rankNode,puuId);
             oneMatchDetail.setRank(rank);
             MatchesListInfo matchRecord = new MatchesListInfo();
             matchRecord.setGameId(gameId);
@@ -78,9 +80,11 @@ public class MatchOneDetail {
                 id=OneMatchDetails.get("queueId").asText();
                 type="queueId";
             }
+
             matchRecord.setMapName(getGameMapNameById(id,type));
             matchRecord.setWin(participants.get(i).get("stats").get("win").asBoolean());
             matchRecord.setChampionName(getChampionNameById(participants.get(i).get("championId").asInt()));
+            oneMatchDetail.setRatedRating(rankNode.get("CHERRY").get("ratedRating").asText());
             oneMatchDetail.setMatchesListInfo(matchRecord);
             oneMatchDetail.setGameName(participantIdentities.get(i).get("player").get("gameName").asText() + "#" + participantIdentities.get(i).get("player").get("tagLine").asText());
             oneMatchDetail.setDeaths(participants.get(i).get("stats").get("deaths").asInt());
@@ -157,8 +161,7 @@ public class MatchOneDetail {
         return oneMatchDetails;
     }
 
-    public Rank rank(String puuId) throws JsonProcessingException {
-        JsonNode rankNode = objectMapper.readTree(callApi.callApiGet("/lol-ranked/v1/ranked-stats/" + puuId, getGlobalTokenAndPort.getToken(), getGlobalTokenAndPort.getPort(), null)).get("queueMap");
+    public Rank rank(JsonNode rankNode, String puuId) throws JsonProcessingException {
         Rank rank = new Rank();
         rank.setRANKED_FLEX_SR_CurrentSeason_Division(returnDivision(rankNode.get("RANKED_FLEX_SR").get("division").asText()));
         rank.setRANKED_FLEX_SR_CurrentSeason_HighestDivision(returnDivision(rankNode.get("RANKED_FLEX_SR").get("highestDivision").asText()));
