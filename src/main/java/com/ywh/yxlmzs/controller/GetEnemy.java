@@ -145,7 +145,7 @@ public class GetEnemy {
                             championSummaryIds.add(String.valueOf(participants.get(i).get(j).get("championId").asInt()));
                             matchRecord.setChampionIcon(
                                     saveImage.saveImage(championSummary,championSummaryIds,"championSummary",
-                                            "png",
+                                            "jpg",
                                             "champion-summary").get(0));
 
                             matchRecord.setDeaths(participants.get(i).get(j).get("stats").get("deaths").asInt());
