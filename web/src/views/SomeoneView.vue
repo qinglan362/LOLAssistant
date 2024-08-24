@@ -228,7 +228,7 @@ const returnTableColor=({row})=>{
              <template v-slot="scope">
                <!--            通过读取本地-->
 <!--               <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
-               <img :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+               <img :src="imageInfoSrc(scope.row.championImage.image)" alt="" style="width: 35px; height: 35px">
                <!--            通过网络直接获取-->
                <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
                {{ scope.row.matchesListInfo.championName }}
@@ -236,12 +236,34 @@ const returnTableColor=({row})=>{
            </el-table-column>
            <el-table-column  label="天赋" width="240">
              <template  v-slot="scope">
-               <img v-for="(item,index) in scope.row.perkImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
-             </template>
+               <el-popover
+                   v-for="(item,index) in scope.row.perkImage"
+                   placement="top-start"
+                   :width="200"
+                   trigger="hover"
+                   :content="item.toolTips"
+                   :key="index"
+               >
+                 <template #reference>
+                   <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                 </template>
+               </el-popover>
+               </template>
            </el-table-column>
            <el-table-column  label="召唤师技能" width="100">
              <template v-slot="scope">
-               <img v-for="(item,index) in scope.row.spellsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+               <el-popover
+                   v-for="(item,index) in scope.row.spellsImage"
+                   placement="top-start"
+                   :width="200"
+                   trigger="hover"
+                   :content="item.toolTips"
+                   :key="index"
+               >
+                 <template #reference>
+                   <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                 </template>
+               </el-popover>
              </template>
            </el-table-column>
            <el-table-column  prop="champLevel" label="角色等级" width="80"/>
@@ -282,7 +304,18 @@ const returnTableColor=({row})=>{
            </el-table-column>
            <el-table-column prop="" label="装备" width="300">
              <template v-slot="scope">
-               <img v-for="(item,index) in scope.row.itemsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+               <el-popover
+                   v-for="(item,index) in scope.row.itemsImage"
+                   placement="top-start"
+                   :width="200"
+                   trigger="hover"
+                   :content="item.toolTips"
+                   :key="index"
+               >
+                 <template #reference>
+                   <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                 </template>
+               </el-popover>
              </template>
            </el-table-column>
            <el-table-column prop="" label="段位" width="150">
@@ -348,20 +381,43 @@ const returnTableColor=({row})=>{
            <el-table-column prop="championName" label="角色" width="160">
              <template v-slot="scope">
                <!--            通过读取本地-->
-               <img :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+               <!--               <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
+               <img :src="imageInfoSrc(scope.row.championImage.image)" alt="" style="width: 35px; height: 35px">
                <!--            通过网络直接获取-->
                <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
                {{ scope.row.matchesListInfo.championName }}
              </template>
            </el-table-column>
-           <el-table-column label="天赋" width="240">
-             <template v-slot="scope">
-               <img v-for="(item,index) in scope.row.perkImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+           <el-table-column  label="天赋" width="240">
+             <template  v-slot="scope">
+               <el-popover
+                   v-for="(item,index) in scope.row.perkImage"
+                   placement="top-start"
+                   :width="200"
+                   trigger="hover"
+                   :content="item.toolTips"
+                   :key="index"
+               >
+                 <template #reference>
+                   <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                 </template>
+               </el-popover>
              </template>
            </el-table-column>
            <el-table-column  label="召唤师技能" width="100">
              <template v-slot="scope">
-               <img v-for="(item,index) in scope.row.spellsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+               <el-popover
+                   v-for="(item,index) in scope.row.spellsImage"
+                   placement="top-start"
+                   :width="200"
+                   trigger="hover"
+                   :content="item.toolTips"
+                   :key="index"
+               >
+                 <template #reference>
+                   <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                 </template>
+               </el-popover>
              </template>
            </el-table-column>
            <el-table-column prop="champLevel" label="角色等级" width="80"/>
@@ -402,7 +458,18 @@ const returnTableColor=({row})=>{
            </el-table-column>
            <el-table-column prop="" label="装备" width="300">
              <template v-slot="scope">
-               <img v-for="(item,index) in scope.row.itemsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+               <el-popover
+                   v-for="(item,index) in scope.row.itemsImage"
+                   placement="top-start"
+                   :width="200"
+                   trigger="hover"
+                   :content="item.toolTips"
+                   :key="index"
+               >
+                 <template #reference>
+                   <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                 </template>
+               </el-popover>
              </template>
            </el-table-column>
            <el-table-column prop="" label="段位" width="150">
@@ -471,7 +538,7 @@ const returnTableColor=({row})=>{
             <template v-slot="scope">
               <!--            通过读取本地-->
 <!--              <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
-              <img  :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+              <img  :src="imageInfoSrc(scope.row.championImage.image)" alt="" style="width: 35px; height: 35px">
               <!--            通过网络直接获取-->
               <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
               {{ scope.row.matchesListInfo.championName }}
@@ -479,12 +546,34 @@ const returnTableColor=({row})=>{
           </el-table-column>
           <el-table-column prop="" label="选择特性" width="300">
             <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.augments"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+              <el-popover
+                  v-for="(item,index) in scope.row.augments"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column  label="召唤师技能" width="100">
             <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.spellsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+              <el-popover
+                  v-for="(item,index) in scope.row.spellsImage"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
             </template>
           </el-table-column>
           <el-table-column  prop="champLevel" label="角色等级" width="80"/>
@@ -525,8 +614,19 @@ const returnTableColor=({row})=>{
           </el-table-column>
           <el-table-column prop="" label="装备" width="300">
             <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.itemsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
-            </template>
+              <el-popover
+                  v-for="(item,index) in scope.row.itemsImage"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
+             </template>
           </el-table-column>
           <el-table-column prop="" label="段位" width="150">
             <template v-slot="scope">
@@ -598,7 +698,7 @@ const returnTableColor=({row})=>{
               <template v-slot="scope">
                 <!--            通过读取本地-->
 <!--                <img v-if='isTrue(scope.row.matchesListInfo.championName)' :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
-                <img  :src="imageInfoSrc(scope.row.championImage)" alt="" style="width: 35px; height: 35px">
+                <img  :src="imageInfoSrc(scope.row.championImage.image)" alt="" style="width: 35px; height: 35px">
                 <!--            通过网络直接获取-->
                 <!--            <img :src="scope.row.championImage" alt="" style="width: 35px; height: 35px">-->
                 {{ scope.row.matchesListInfo.championName }}
@@ -606,16 +706,38 @@ const returnTableColor=({row})=>{
             </el-table-column>
             <el-table-column  label="召唤师技能" width="100">
               <template v-slot="scope">
-                <img v-for="(item,index) in scope.row.spellsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+                <el-popover
+                    v-for="(item,index) in scope.row.spellsImage"
+                    placement="top-start"
+                    :width="200"
+                    trigger="hover"
+                    :content="item.toolTips"
+                    :key="index"
+                >
+                  <template #reference>
+                    <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                  </template>
+                </el-popover>
               </template>
             </el-table-column>
-            <el-table-column  prop="champLevel" label="角色等级" width="80"/>
+          <el-table-column  prop="champLevel" label="角色等级" width="80"/>
           <el-table-column prop="" label="海克斯" width="200">
             <template v-slot="scope">
-              <img v-for="(item,index) in scope.row.augments"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
+              <el-popover
+                  v-for="(item,index) in scope.row.augments"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
             </template>
           </el-table-column>
-               <el-table-column  label="KDA" width="120">
+          <el-table-column  label="KDA" width="120">
             <template v-slot="scope">
               <el-popover
                   placement="top-start"
@@ -650,11 +772,22 @@ const returnTableColor=({row})=>{
               </el-popover>
             </template>
           </el-table-column>
-            <el-table-column prop="" label="装备" width="300">
-              <template v-slot="scope">
-                <img v-for="(item,index) in scope.row.itemsImage"  :key="index"  :src="imageInfoSrc(item)" alt="" style="width: 35px; height: 35px">
-              </template>
-            </el-table-column>
+          <el-table-column prop="" label="装备" width="300">
+            <template v-slot="scope">
+              <el-popover
+                  v-for="(item,index) in scope.row.itemsImage"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
+             </template>
+          </el-table-column>
             <el-table-column prop="" label="段位" width="150">
               <template v-slot="scope">
                 <el-popover

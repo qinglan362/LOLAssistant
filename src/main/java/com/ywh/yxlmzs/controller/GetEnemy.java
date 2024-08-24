@@ -88,12 +88,18 @@ public class GetEnemy {
 
         List<CurrentHistory> AllMyTeamMatchRecords = new ArrayList<>();
 
+        JsonNode championSummary = objectMapper.readTree(callApi.callApiGet("/lol-game-data/assets/v1/champion-summary.json", token, port, null));
+        JsonNode profileIcons = objectMapper.readTree(callApi.callApiGet("/lol-game-data/assets/v1/profile-icons.json", token, port, null));
+
+
         for (String puuid : enemyPuuIds) {
 
             CurrentHistory currentHistory = new CurrentHistory();
             JsonNode current=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v2/summoners/puuid/"+puuid,token,port,null));
             currentHistory.setName(current.get("gameName").asText()+"#"+current.get("tagLine").asText());
-            currentHistory.setIcon(saveImage.saveImage("summonerricon",current.get("profileIconId").asText(),"jpg","profile-icons"));
+            List<String> summonerriconids = new ArrayList<>();
+            summonerriconids.add(String.valueOf(current.get("profileIconId").asInt()));
+            currentHistory.setIcon(saveImage.saveImage(profileIcons,summonerriconids,"summonerricon","jpg","profile-icons").get(0));
 
             String tier=objectMapper.readTree(callApi.callApiGet(
                     "/lol-ranked/v1/ranked-stats/"+puuid,
@@ -135,12 +141,13 @@ public class GetEnemy {
                     for (int j = 0; j < participantIdentities.get(i).size(); j++) {
                         if (participantIdentities.get(i).get(j).get("player").get("puuid").asText().equals(puuid)) {
                             MatchRecord matchRecord = new MatchRecord();
+                            List<String>  championSummaryIds = new ArrayList<>();
+                            championSummaryIds.add(String.valueOf(participants.get(i).get(j).get("championId").asInt()));
                             matchRecord.setChampionIcon(
-                                    saveImage.saveImage("championSummary",
-                                            participants.get(i).get(j).get("championId").asText(),
+                                    saveImage.saveImage(championSummary,championSummaryIds,"championSummary",
                                             "png",
-                                            "champion-summary")
-                            );
+                                            "champion-summary").get(0));
+
                             matchRecord.setDeaths(participants.get(i).get(j).get("stats").get("deaths").asInt());
                             matchRecord.setKills(participants.get(i).get(j).get("stats").get("kills").asInt());
                             matchRecord.setAssists(participants.get(i).get(j).get("stats").get("assists").asInt());

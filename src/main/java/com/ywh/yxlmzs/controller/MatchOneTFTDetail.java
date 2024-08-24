@@ -12,6 +12,7 @@ import com.ywh.yxlmzs.service.GetSummoners;
 import com.ywh.yxlmzs.utils.CallApi;
 import com.ywh.yxlmzs.utils.GetGlobalTokenAndPort;
 import com.ywh.yxlmzs.utils.Position;
+import com.ywh.yxlmzs.utils.SaveImage;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,8 @@ public class MatchOneTFTDetail {
     ObjectMapper objectMapper;
     @Resource
     GetSummoners getSummoners;
+    @Resource
+    SaveImage saveImages;
 
     private String currentSeasonRank;
     private GetGlobalTokenAndPort getGlobalTokenAndPort;
@@ -57,6 +60,8 @@ public class MatchOneTFTDetail {
         int begIndex=(Integer.parseInt(data.get("currentPage"))-1)*18+Integer.parseInt(data.get("index"));
 
         //tag也可以作为参数
+        //好像不好用呢
+
         Map<String, Object> map1 = Map.of("begin", begIndex, "count", 1);
 
         JSONObject jsonObject = JSONObject.parseObject(getSummoners.getSummoners(Map.of("name",data.get("name"))));
@@ -69,7 +74,6 @@ public class MatchOneTFTDetail {
                         map1
                 )
         ).get("games");
-        System.out.println(gamesJSON);
 
             JsonNode json=gamesJSON.get(0).get("json");
             JsonNode tags=gamesJSON.get(0).get("metadata").get("tags");
@@ -84,6 +88,7 @@ public class MatchOneTFTDetail {
             JsonNode participants=json.get("participants");
             List<TFTOneMatchDetail> tftOneMatchDetails=new ArrayList<>();
             for (JsonNode participant:participants){
+
                 TFTOneMatchDetail tftOneMatchDetail=new TFTOneMatchDetail();
                 String puuid=participant.get("puuid").asText();
                 tftOneMatchDetail.setGameName(gameName(puuid));
@@ -91,21 +96,41 @@ public class MatchOneTFTDetail {
                 tftOneMatchDetail.setPlacement(participant.get("placement").asText());
                 tftOneMatchDetail.setLevel(participant.get("level").asText());
                 tftOneMatchDetail.setRank(rank(puuid));
+
+                JsonNode companion=objectMapper.readTree(
+                        callApi.callApiGet(
+                                "/lol-game-data/assets/v1/companions.json",
+                                getGlobalTokenAndPort.getToken(),
+                                getGlobalTokenAndPort.getPort(),
+                                null
+                        )
+                );
                 tftOneMatchDetail.setCompanion(
-                        saveImage(
-                        "companion",
-                         participant.get("companion").get("content_ID").asText(),
-                        "png",
-                        //这个是小小英雄原画 目前还没找到游戏记录中的小图像地址
-                        "/lol-game-data/assets/v1/companions.json",
-                        "companion",
-                                ""
+                        saveImages.saveImage(
+                                companion,
+                                List.of(participant.get("companion").get("content_ID").asText()),
+                                "companion",
+                                "png",
+                                "companion"
+                        ).get(0));
+
+
+                JsonNode tftUnits= objectMapper.readTree(callApi.callApiGet(
+                        "/lol-game-data/assets/v1/tftchampions.json",
+                        getGlobalTokenAndPort.getToken(),
+                        getGlobalTokenAndPort.getPort(),
+                        null
+                ));
+                JsonNode tftItems= objectMapper.readTree(callApi.callApiGet(
+                        "/lol-game-data/assets/v1/tftitems.json",
+                        getGlobalTokenAndPort.getToken(),
+                        getGlobalTokenAndPort.getPort(),
+                        null
                 ));
 
                 List<ImageAndMessage> units=new ArrayList<>();
                 JsonNode unit=participant.get("units");
                 for (JsonNode u:unit){
-
                      String character_id=u.get("character_id").asText();
                      List<String> itemName = StreamSupport.stream(u.get("itemNames").spliterator(), false)
                             .limit(3)
@@ -114,32 +139,26 @@ public class MatchOneTFTDetail {
 
                      ImageAndMessage imageAndMessage=new ImageAndMessage();
 
-                     imageAndMessage.setUnitImage(
-                             saveImage(
+                    imageAndMessage.setUnitImage(
+                             saveImages.saveImage(
+                                        tftUnits,
+                                        List.of(character_id),
                                         "tftChampions",
-                                        character_id,
                                         "png",
-                                        "/lol-game-data/assets/v1/tftchampions.json",
-                                        "tftChampions",
-                                      ""
-                             )
+                                        "tftChampions"
+                             ).get(0)
                      );
 
-                     if (!itemName.isEmpty()){
-                         List<String> itemImages=new ArrayList<>();
-                         for (String item:itemName){
-                             itemImages.add(
-                                     saveImage(
-                                             "tftitems",
-                                             item,
-                                             "png",
-                                             "/lol-game-data/assets/v1/tftitems.json",//这里面不只有装备 也有海克斯augment
-                                             "tftitems",
-                                             ""
-                                     )
-                             );
-                         }
-                         imageAndMessage.setItemImage(itemImages);
+                    if (!itemName.isEmpty()){
+                        System.out.println(itemName);
+                        List<String> itemIds = new ArrayList<>(itemName);
+                         imageAndMessage.setItemImage(saveImages.saveImage(
+                                    tftItems,
+                                    itemIds,
+                                    "tftitems",
+                                    "png",
+                                    "tftitems"
+                         ));
                      }
 
                     units.add(imageAndMessage);
@@ -151,45 +170,42 @@ public class MatchOneTFTDetail {
                 List<String> augments = StreamSupport.stream(participant.get("augments").spliterator(), false)
                         .map(JsonNode::asText)
                         .toList();
-                List<String> augmentsImage=new ArrayList<>();
-                for(String augment:augments){
-                    augmentsImage.add(saveImage(
-                            "tftaugment",
-                             augment,
-                            "png",
-                            "/lol-game-data/assets/v1/tftitems.json",//这里面不只有装备 也有海克斯augment
-                            "tftitems",
-                            ""
-                    ));
-                }
-                tftOneMatchDetail.setAugments(augmentsImage);
+                tftOneMatchDetail.setAugments(saveImages.saveImage(
+                        tftItems,
+                        augments,
+                        "tftitems",
+                        "png",
+                        "tftitems"
+                ));
 
 
                 //羁绊
+                JsonNode traitsJson=objectMapper.readTree(callApi.callApiGet(
+                        "/lol-game-data/assets/v1/tfttraits.json",
+                        getGlobalTokenAndPort.getToken(),
+                        getGlobalTokenAndPort.getPort(),
+                        null
+                ));
                 List<String> traitsImage=new ArrayList<>();
                 JsonNode traits=participant.get("traits");
                 for (JsonNode trait:traits){
                       if (trait.get("tier_current").asInt()>0){
-                            traitsImage.add(
-                                    saveImage(
-                                            "tfttraits",
-                                            trait.get("name").asText(),
-                                            "png",
-                                            "/lol-game-data/assets/v1/tfttraits.json",
-                                            "tfttraits",
-                                             trait.get("style").asText()
-                                    )
-                            );
+                            traitsImage.add(trait.get("name").asText());
                       }
                 }
-                tftOneMatchDetail.setTraits(traitsImage);
+                System.out.println(traitsImage);
+                tftOneMatchDetail.setTraits(saveImages.saveImage(
+                        traitsJson,
+                        traitsImage,
+                        "tfttraits",
+                        "png",
+                        "tfttraits"
+                ));
 
                 if (currentSeasonRank.isEmpty()){
                     currentSeasonRank = "UNRANKED";
                 }
-                //网络获取
-                // tftOneMatchDetail.setRankImage("https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/"+currentSeasonRank.toLowerCase()+".png");
-                //本地获取
+
                 tftOneMatchDetail.setRankImage("rank/"+currentSeasonRank.toLowerCase()+".png");
 
 

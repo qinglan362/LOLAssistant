@@ -1,5 +1,6 @@
 package com.ywh.yxlmzs.entity;
 
+import com.ywh.yxlmzs.entity.vo.ImageAndToolTips;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageAndMessage {
-    private String unitImage;
-    private List<String> itemImage;
+    private ImageAndToolTips unitImage;
+    private List<ImageAndToolTips> itemImage;
 }

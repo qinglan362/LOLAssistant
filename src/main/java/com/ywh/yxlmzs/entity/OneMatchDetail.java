@@ -1,5 +1,6 @@
 package com.ywh.yxlmzs.entity;
 
+import com.ywh.yxlmzs.entity.vo.ImageAndToolTips;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,11 +18,11 @@ public class OneMatchDetail {
     private Integer kills;
     private Integer assists;
     private String champLevel;
-    private List<String> itemsImage;
-    private List<String> spellsImage;
-    private String championImage;
+    private List<ImageAndToolTips> itemsImage;
+    private List<ImageAndToolTips> spellsImage;
+    private ImageAndToolTips championImage;
     private String rankImage;
-    private List<String> perkImage;
+    private List<ImageAndToolTips> perkImage;
     private  String totalDamageTaken;
     private  String totalDamageDealtToChampions;
     private  String wardsPlaced;
@@ -29,7 +30,7 @@ public class OneMatchDetail {
     //斗魂竞技场名次1-8
     private String subteamPlacement;
     //斗魂竞技场海克斯
-    private List<String> augments;
+    private List<ImageAndToolTips> augments;
     //斗魂竞技场分数
     private String ratedRating;
 }

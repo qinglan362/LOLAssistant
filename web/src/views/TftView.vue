@@ -184,30 +184,75 @@ const  chooseMoshi=ref('全部')
           </el-table-column>
           <el-table-column prop="championName" label="角色" width="160">
             <template v-slot="scope">
-              <img  :src="imageInfoSrc(scope.row.companion)" alt="" style="width: 35px; height: 35px">
+              <img  :src="imageInfoSrc(scope.row.companion.image)" alt="" style="width: 35px; height: 35px">
               {{scope.row.level}}级
             </template>
           </el-table-column>
           <el-table-column label="棋子" style="width: 700px; height: 70px;">
             <template v-slot="scope">
+
+
               <div style="display: flex; align-items: center; margin-bottom: 10px;" v-for="(unit, unitIndex) in scope.row.units" :key="unitIndex">
-                <img :src="imageInfoSrc(unit.unitImage)" alt="" style="width: 35px; height: 35px; margin-right: 10px;">
+                <el-popover
+                    placement="top-start"
+                    :width="200"
+                    trigger="hover"
+                    :content="unit.unitImage.toolTips"
+                    :key="index"
+                >
+                  <template #reference>
+                    <img :src="imageInfoSrc(unit.unitImage.image)" alt="" style="width: 35px; height: 35px">
+                  </template>
+                </el-popover>
                 <div style="display: flex;">
-                  <img v-for="(item, itemIndex) in unit.itemImage" :key="itemIndex" :src="imageInfoSrc(item)" alt="" style="width: 20px; height: 20px; margin-right: 5px;">
-                </div>
+                  <el-popover
+                      v-for="(item, index) in unit.itemImage"
+                      placement="top-start"
+                      :width="200"
+                      trigger="hover"
+                      :content="item.toolTips"
+                      :key="index"
+                  >
+                    <template #reference>
+                      <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                    </template>
+                  </el-popover>
+                   </div>
               </div>
+
             </template>
           </el-table-column>
           <el-table-column label="羁绊" style="width: 300px">
             <template v-slot="scope">
-                <img v-for="(trait,index) in scope.row.traits" :key="index" :src="imageInfoSrc(trait)" alt="" style="width: 35px; height: 35px">
+              <el-popover
+                  v-for="(item,index) in scope.row.traits"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
 
             </template>
           </el-table-column>
           <el-table-column label="海克斯" style="width: 200px">
             <template v-slot="scope">
-              <img v-for="(augment,index) in scope.row.augments" :key="index" :src="imageInfoSrc(augment)" alt="" style="width: 35px; height: 35px">
-
+              <el-popover
+                  v-for="(item,index) in scope.row.augments"
+                  placement="top-start"
+                  :width="200"
+                  trigger="hover"
+                  :content="item.toolTips"
+                  :key="index"
+              >
+                <template #reference>
+                  <img :src="imageInfoSrc(item.image)" alt="" style="width: 35px; height: 35px">
+                </template>
+              </el-popover>
             </template>
           </el-table-column>
 

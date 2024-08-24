@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.MatchesListInfo;
 import com.ywh.yxlmzs.entity.OneMatchDetail;
 import com.ywh.yxlmzs.entity.Rank;
+import com.ywh.yxlmzs.entity.vo.ImageAndToolTips;
 import com.ywh.yxlmzs.utils.*;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +57,6 @@ public class MatchOneDetail {
                 null
          ));
 
-
-
         List<OneMatchDetail> oneMatchDetails = new ArrayList<>();
         JsonNode participants = OneMatchDetails.get("participants");
         JsonNode participantIdentities = OneMatchDetails.get("participantIdentities");
@@ -96,37 +95,59 @@ public class MatchOneDetail {
             oneMatchDetail.setWardsPlaced(participants.get(i).get("stats").get("wardsPlaced").asText());
             oneMatchDetail.setTotalMinionsKilled(participants.get(i).get("stats").get("totalMinionsKilled").asText());
 
-            List<String> itemsImage = new ArrayList<>();
+
+            JsonNode itemJson = objectMapper.readTree(
+                    callApi.callApiGet(
+                            "/lol-game-data/assets/v1/items.json",
+                            getGlobalTokenAndPort.getToken(),
+                            getGlobalTokenAndPort.getPort(),
+                            null
+                    )
+            );
+            List<String> itemIds = new ArrayList<>();
             for (int j = 0; j <=6; j++) {
                int itemId = participants.get(i).get("stats").get("item" + j).asInt();
                if (itemId != 0) {
-                    String Image =saveImage.saveImage("items", String.valueOf(itemId), "png", "items");
-                    itemsImage.add(Image);
+                      itemIds.add(String.valueOf(itemId));
                }
             }
-            oneMatchDetail.setItemsImage(itemsImage);
+            oneMatchDetail.setItemsImage(saveImage.saveImage(itemJson,itemIds,"items", "png", "items"));
 
           //斗魂竞技场海克斯 这里面也有无尽狂潮的选的增幅海克斯
-            List<String> augments = new ArrayList<>();
+            JsonNode augmentJson = objectMapper.readTree(
+                    callApi.callApiGet(
+                            "/lol-game-data/assets/v1/cherry-augments.json",
+                            getGlobalTokenAndPort.getToken(),
+                            getGlobalTokenAndPort.getPort(),
+                            null
+                    )
+            );
+            List<String> augmentIds = new ArrayList<>();
             for (int j = 1; j <=6; j++) {
                 int augmentId = participants.get(i).get("stats").get("playerAugment" + j).asInt();
                 if (augmentId != 0) {
-                    String Image =saveImage.saveImage("augment", String.valueOf(augmentId), "png", "cherry-augments");
-                    augments.add(Image);
+                    augmentIds.add(String.valueOf(augmentId));
                 }
             }
-            oneMatchDetail.setAugments(augments);
+            oneMatchDetail.setAugments(saveImage.saveImage(augmentJson,augmentIds,"augment",  "png", "cherry-augments"));
 
 
-            List<String> spellImage = new ArrayList<>();
+            JsonNode spelljson = objectMapper.readTree(
+                    callApi.callApiGet(
+                            "/lol-game-data/assets/v1/summoner-spells.json",
+                            getGlobalTokenAndPort.getToken(),
+                            getGlobalTokenAndPort.getPort(),
+                            null
+                    )
+            );
+            List<String> spellIds = new ArrayList<>();
             for (int j = 1; j <=2; j++) {
                 int itemId = participants.get(i).get("spell" + j+"Id").asInt();
                 if (itemId != 0) {
-                    String Image =saveImage.saveImage("summonerSpells", String.valueOf(itemId), "png", "summoner-spells");
-                    spellImage.add(Image);
+                    spellIds.add(String.valueOf(itemId));
                 }
             }
-            oneMatchDetail.setSpellsImage(spellImage);
+            oneMatchDetail.setSpellsImage(saveImage.saveImage(spelljson,spellIds,"summonerSpells", "png", "summoner-spells"));
 
 
             if (currentSeasonRank.isEmpty()){
@@ -135,20 +156,35 @@ public class MatchOneDetail {
             oneMatchDetail.setRankImage("rank/"+currentSeasonRank.toLowerCase()+".png");
 
 
-             String championImage = "";
-             int itemId = participants.get(i).get("championId").asInt();
-             championImage =saveImage.saveImage("championSummary", String.valueOf(itemId), "jpg", "champion-summary");
-             oneMatchDetail.setChampionImage(championImage);
+            JsonNode championSummaryJson = objectMapper.readTree(
+                    callApi.callApiGet(
+                            "/lol-game-data/assets/v1/champion-summary.json",
+                            getGlobalTokenAndPort.getToken(),
+                            getGlobalTokenAndPort.getPort(),
+                            null
+                    )
+            );
+             List<String> championIds = new ArrayList<>();
+             championIds.add(String.valueOf(participants.get(i).get("championId").asInt()));
+             oneMatchDetail.setChampionImage(saveImage.saveImage(championSummaryJson,championIds,"championSummary", "jpg", "champion-summary").get(0));
 
+
+            JsonNode perkJson = objectMapper.readTree(
+                    callApi.callApiGet(
+                            "/lol-game-data/assets/v1/perks.json",
+                            getGlobalTokenAndPort.getToken(),
+                            getGlobalTokenAndPort.getPort(),
+                            null
+                    )
+            );
+            List<String> perkIds = new ArrayList<>();
             String mapId=OneMatchDetails.get("mapId").asText();
              if (!(mapId.equals("30")||mapId.equals("33"))){
-                 List<String> perkStyleImage = new ArrayList<>();
                  for (int j = 0; j <=5; j++) {
                      int perk = participants.get(i).get("stats").get("perk" + j).asInt();
-                     String Image =saveImage.saveImage("perks", String.valueOf(perk), "png", "perks");
-                     perkStyleImage.add(Image);
+                      perkIds.add(String.valueOf(perk));
                  }
-                 oneMatchDetail.setPerkImage(perkStyleImage);
+                 oneMatchDetail.setPerkImage(saveImage.saveImage(perkJson,perkIds, "perks","png", "perks"));
              }
 
              //斗魂竞技场名次

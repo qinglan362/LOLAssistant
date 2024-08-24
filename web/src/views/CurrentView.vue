@@ -44,7 +44,7 @@ const getBackgorundColor = ({row}) => {
   <el-row :gutter="24">
     <el-col :span="6" v-for="(item,index) in All" :key="index">
        {{item.name}}
-      <el-avatar :size="60" :src="imageInfoSrc(item.icon)" @error="errorHandler">
+      <el-avatar :size="60" :src="imageInfoSrc(item.icon.image)" @error="errorHandler">
         <img
             src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
          alt=""/>
@@ -62,7 +62,7 @@ const getBackgorundColor = ({row}) => {
               <img
                   width="50px"
                   height="50px"
-                  :src="imageInfoSrc(scope.row.championIcon)"
+                  :src="imageInfoSrc(scope.row.championIcon.image)"
                   alt=""/>
             </template>
           </el-table-column>

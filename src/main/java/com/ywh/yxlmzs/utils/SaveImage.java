@@ -1,107 +1,22 @@
-//package com.ywh.yxlmzs.utils;
-//
-//import com.fasterxml.jackson.databind.JsonNode;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import jakarta.annotation.Resource;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Service;
-//
-//import javax.imageio.ImageIO;
-//import java.awt.image.BufferedImage;
-//import java.io.ByteArrayOutputStream;
-//import java.io.File;
-//import java.io.FileOutputStream;
-//import java.io.IOException;
-//import java.nio.file.Files;
-//import java.nio.file.Paths;
-//import java.util.Base64;
-//
-//@Service
-//public class SaveImage {
-//
-//    @Resource
-//    CallApi callApi;
-//    @Resource
-//    ObjectMapper objectMapper;
-//    private final GetGlobalTokenAndPort getGlobalTokenAndPort;
-//
-//    @Autowired
-//    public SaveImage(GetGlobalTokenAndPort getGlobalTokenAndPort) {
-//        this.getGlobalTokenAndPort = getGlobalTokenAndPort;
-//    }
-//
-//    public String saveImage(String floderName, String fileName, String houzhui,String type ) throws IOException {
-//
-//        if (!Files.exists(Paths.get(System.getProperty("user.dir")+"/images/"+floderName+"/"+fileName+ "."+houzhui))) {
-//            JsonNode typeImage  = objectMapper.readTree(
-//                    callApi.callApiGet(
-//                            "/lol-game-data/assets/v1/"+type+".json",
-//                            getGlobalTokenAndPort.getToken(),
-//                            getGlobalTokenAndPort.getPort(),
-//                            null
-//                    )
-//            );
-//            String url="";
-//            for (JsonNode ti : typeImage) {
-//                if (ti.get("id").asInt() == Integer.parseInt(fileName)) {
-//                    if (type.equals("champion-summary")) {
-//                        url = ti.get("squarePortraitPath").asText();
-//                    } else if (type.equals("items")||type.equals("summoner-spells")||type.equals("perks")) {
-//                        url = ti.get("iconPath").asText();
-//                    } else if (type.equals("cherry-augments")) {
-//                        System.out.println(ti.get("rarity"));
-//                        url = ti.get("augmentSmallIconPath").asText();
-//                    }
-//                    break;
-//                }
-//            }
-//            byte[] imageBytes = callApi.callApiGetImage(url,
-//                    getGlobalTokenAndPort.getToken(),
-//                    getGlobalTokenAndPort.getPort(),
-//                    null);
-//            String directoryPath = System.getProperty("user.dir")+"/images/"+floderName+"/";
-//            Files.createDirectories(Paths.get(directoryPath));
-//            try (FileOutputStream fos = new FileOutputStream(directoryPath +fileName + "."+houzhui)) {
-//                fos.write(imageBytes);
-//            }catch (IOException e){
-//                e.printStackTrace();
-//            }
-//            BufferedImage image = ImageIO.read(new File(directoryPath +fileName + "."+houzhui));
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            ImageIO.write(image, houzhui, baos);
-//            String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-//           return  base64Image;
-//        }else{
-//            BufferedImage image = ImageIO.read(new File(System.getProperty("user.dir")+"/images/"+floderName+"/"+fileName + "."+houzhui));
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            ImageIO.write(image, houzhui, baos);
-//            String base64Image = Base64.getEncoder().encodeToString(baos.toByteArray());
-//            return base64Image;
-//        }
-//    }
-//
-//}
 package com.ywh.yxlmzs.utils;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.IterationType;
+import com.ywh.yxlmzs.entity.vo.ImageAndToolTips;
 import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.stereotype.Service;
-
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.*;
 
 @Service
 public class SaveImage {
 
     @Resource
     CallApi callApi;
-    @Resource
-    ObjectMapper objectMapper;
     private final GetGlobalTokenAndPort getGlobalTokenAndPort;
 
     @Autowired
@@ -109,49 +24,136 @@ public class SaveImage {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
     }
 
-    public String saveImage(String folderName, String fileName, String extension, String type) throws IOException {
+    public List<ImageAndToolTips> saveImage(JsonNode node, List<String> ids, String folderName,  String extension, String type) throws IOException {
 
-        String filePath = System.getProperty("user.dir") + "/images/" + folderName + "/" + fileName + "." + extension;
+        List<ImageAndToolTips> imageAndToolTipsList = new ArrayList<>();
 
-        if (!Files.exists(Paths.get(filePath))) {
-            JsonNode typeImage = objectMapper.readTree(
-                    callApi.callApiGet(
-                            "/lol-game-data/assets/v1/" + type + ".json",
-                            getGlobalTokenAndPort.getToken(),
-                            getGlobalTokenAndPort.getPort(),
-                            null
-                    )
-            );
+        int count=0;
+        String url="";
 
-            String url = "";
-            for (JsonNode ti : typeImage) {
-                if (ti.get("id").asInt() == Integer.parseInt(fileName)) {
-                    if (type.equals("champion-summary")) {
-                        url = ti.get("squarePortraitPath").asText();
-                    } else if (type.equals("items") || type.equals("summoner-spells") || type.equals("perks")||type.equals("profile-icons")) {
-                        url = ti.get("iconPath").asText();
-                    } else if (type.equals("cherry-augments")) {
-                        url = ti.get("augmentSmallIconPath").asText();
+        Set<String> idSet = new HashSet<>(ids);
+        List<JsonNode> matchingNodes = new ArrayList<>();
+
+        label:
+        for (JsonNode js : node) {
+            switch (type) {
+                case "companion" -> {
+                    if (idSet.contains(js.get("contentId").asText())) {
+                        matchingNodes.add(js);
+                        count++;
                     }
-                    break;
+                    if (count == idSet.size()) {
+                        break label;
+                    }
                 }
-            }
-
-            byte[] imageBytes = callApi.callApiGetImage(url,
-                    getGlobalTokenAndPort.getToken(),
-                    getGlobalTokenAndPort.getPort(),
-                    null);
-
-            String directoryPath = System.getProperty("user.dir") + "/images/" + folderName + "/";
-            Files.createDirectories(Paths.get(directoryPath));
-
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                fos.write(imageBytes);
-            } catch (IOException e) {
-                e.printStackTrace();
+                case "items", "cherry-augments", "summoner-spells", "champion-summary", "perks", "profile-icons" -> {
+                    if (idSet.contains(js.get("id").asText())) {
+                        matchingNodes.add(js);
+                        count++;
+                    }
+                    if (count == idSet.size()) {
+                        break label;
+                    }
+                }
+                case "tftChampions" -> {
+                    if (idSet.contains(js.get("character_record").get("character_id").asText())) {
+                        matchingNodes.add(js);
+                        count++;
+                    }
+                    if (count == idSet.size()) {
+                        break label;
+                    }
+                }
+                case "tftitems" -> {
+                    if (idSet.contains(js.get("nameId").asText())) {
+                        matchingNodes.add(js);
+                        count++;
+                    }
+                    if (count == idSet.size()) {
+                        break label;
+                    }
+                }
+                case "tfttraits" -> {
+                    if (idSet.contains(js.get("trait_id").asText())) {
+                        matchingNodes.add(js);
+                        count++;
+                    }
+                    if (count == idSet.size()) {
+                        break label;
+                    }
+                }
             }
         }
 
-        return folderName+"/"+fileName + "." + extension;
+        for (JsonNode js:matchingNodes){
+                    ImageAndToolTips imageAndToolTips = new ImageAndToolTips();
+                    String filePath = switch (type) {
+                        case "items", "cherry-augments", "summoner-spells", "champion-summary", "perks",
+                             "profile-icons" ->
+                                System.getProperty("user.dir") + "/images/" + folderName + "/" + js.get("id").asText() + "." + extension;
+                        case "companion" ->
+                                System.getProperty("user.dir") + "/images/" + folderName + "/" + js.get("contentId").asText() + "." + extension;
+                        case "tftChampions" ->
+                                System.getProperty("user.dir") + "/images/" + folderName + "/" + js.get("character_record").get("character_id").asText() + "." + extension;
+                        case "tftitems" ->
+                                System.getProperty("user.dir") + "/images/" + folderName + "/" + js.get("nameId").asText() + "." + extension;
+                        case "tfttraits" ->
+                                System.getProperty("user.dir") + "/images/" + folderName + "/" + js.get("trait_id").asText() + "." + extension;
+                        default -> "";
+                    };
+                    //只取filePath的folderName以及后面的部分
+                   imageAndToolTips.setImage(filePath.substring(filePath.indexOf(folderName)));
+                    imageAndToolTips.setToolTips("");
+            switch (type) {
+                case "champion-summary" -> {
+                    url = js.get("squarePortraitPath").asText();
+                    imageAndToolTips.setToolTips(js.get("name").asText());
+                }
+                case "items", "summoner-spells", "perks", "profile-icons" -> {
+                    url = js.get("iconPath").asText();
+                    if (!Objects.isNull(js.get("name"))) {
+                        imageAndToolTips.setToolTips(js.get("name").asText());
+                    }
+                }
+                case "cherry-augments" -> {
+                    url = js.get("augmentSmallIconPath").asText();
+                    imageAndToolTips.setToolTips(js.get("nameTRA").asText());
+                }
+                case "companion" -> {
+                    url = js.get("loadoutsIcon").asText();
+                    imageAndToolTips.setToolTips(js.get("name").asText());
+                }
+                case "tftChampions" -> {
+                    url = js.get("character_record").get("squareIconPath").asText();
+                    imageAndToolTips.setToolTips(js.get("character_record").get("display_name").asText());
+                }
+                case "tftitems" -> {
+                    url = js.get("squareIconPath").asText();
+                    imageAndToolTips.setToolTips(js.get("name").asText());
+                }
+                case "tfttraits" -> {
+                    url = js.get("icon_path").asText();
+                    imageAndToolTips.setToolTips(js.get("tooltip_text").asText());
+                }
+            }
+                    if (!Files.exists(Paths.get(filePath))) {
+                        byte[] imageBytes = callApi.callApiGetImage(
+                                url,
+                                getGlobalTokenAndPort.getToken(),
+                                getGlobalTokenAndPort.getPort(),
+                                null);
+                        String directoryPath = System.getProperty("user.dir") + "/images/" + folderName + "/";
+                        Files.createDirectories(Paths.get(directoryPath));
+
+                        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                            fos.write(imageBytes);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    imageAndToolTipsList.add(imageAndToolTips);
+        }
+
+        return imageAndToolTipsList;
     }
 }

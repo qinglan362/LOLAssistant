@@ -49,11 +49,6 @@ public class MatchesTFTFromPuuid {
         int begIndex=(page-1)*18;
 
 
-//        List<String> tagsParams =new ArrayList<>();
-//        tagsParams.add("ranked");
-//        tagsParams.add("pairs");
-//        tagsParams.add("TFTSet12");
-
         //tag也可以作为参数
         Map<String, Object> param ;
         param = Map.of("begin", begIndex, "count", 18);
@@ -104,15 +99,5 @@ public class MatchesTFTFromPuuid {
         return zonedDateTime.format(formatter);
     }
 
-    public String gameName(String puuId) throws JsonProcessingException {
-
-          JsonNode js   = objectMapper.readTree(callApi.callApiGet(
-                        "/lol-summoner/v2/summoners/puuid/"+puuId,
-                        getGlobalTokenAndPort.getToken(),
-                        getGlobalTokenAndPort.getPort(),
-                        null
-                ));
-        return js.get("gameName").asText()+"#"+js.get("tagLine").asText();
-    }
 
 }
