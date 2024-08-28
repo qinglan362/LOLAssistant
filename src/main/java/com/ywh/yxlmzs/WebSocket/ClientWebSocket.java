@@ -82,7 +82,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
                            break;
                        }
                        JsonNode jsonNode=objectMapper.readTree(callApi.callApiGet("/lol-lobby/v2/lobby", token, port, null));
-                       JsonNode invitations=objectMapper.readTree(callApi.callApiGet("/lol-lobby/v2/lobby", token, port, null)).get("invitations");
+                       System.out.println("lobby = " + jsonNode);
+                       JsonNode invitations=jsonNode.get("invitations");
+                       System.out.println("invitations = " + invitations);
                        int members=invitations.size();
                        for (JsonNode jn:invitations){
                            if (!jn.get("state").asText().equals("Pending")){
@@ -95,8 +97,17 @@ public class ClientWebSocket extends TextWebSocketHandler {
                                    Map<String,Object> map=Map.of("firstPreference",autoSearchMatch.getFirstPosition(),"secondPreference",autoSearchMatch.getSecondPosition());
                                    callApi.callApiPut("/lol-lobby/v2/lobby/members/localMember/position-preferences",token,port,map);
                                }
-                               matchMacking();
-                               break;
+                               JsonNode membersNode=jsonNode.get("members");
+                               int count=membersNode.size();
+                                 for (JsonNode jn:membersNode){
+                                      if (jn.get("ready").asText().equals("true")){
+                                        count--;
+                                      }
+                                 }
+                                 if (count==0){
+                                     matchMacking();
+                                     break;
+                                 }
                            }
                        }
                    }
@@ -245,6 +256,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
         String  port=getGlobalTokenAndPort.getPort();
         String  token=getGlobalTokenAndPort.getToken();
         JsonNode jsonNode=objectMapper.readTree(callApi.callApiPost("/lol-lobby/v2/lobby/matchmaking/search",token,port,null));
+        System.out.println("jsonNode = " + jsonNode);
         if (!Objects.isNull(jsonNode.get("message"))){
             if (!jsonNode.get("message").asText().isEmpty()){
                 return jsonNode.get("message").asText().equals("GATEKEEPER_RESTRICTED");
