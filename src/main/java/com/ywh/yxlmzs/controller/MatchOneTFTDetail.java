@@ -155,7 +155,7 @@ public class MatchOneTFTDetail {
                          imageAndMessage.setItemImage(saveImages.saveImage(
                                     tftItems,
                                     itemIds,
-                                    "tftitems",
+                                    "tftItemsAndAugment",
                                     "png",
                                     "tftitems"
                          ));
@@ -173,7 +173,7 @@ public class MatchOneTFTDetail {
                 tftOneMatchDetail.setAugments(saveImages.saveImage(
                         tftItems,
                         augments,
-                        "tftitems",
+                        "tftItemsAndAugment",
                         "png",
                         "tftitems"
                 ));
@@ -216,57 +216,7 @@ public class MatchOneTFTDetail {
 
         return tft;
     }
-    public String saveImage(String folderName,
-                            String id,
-                            String extension,
-                            String imageUrl,
-                            String type,
-                            String style
-    ) throws IOException {
 
-        String filePath = System.getProperty("user.dir") + "/images/" + folderName + "/" + id + "." + extension;
-
-        if (!Files.exists(Paths.get(filePath))) {
-            JsonNode typeImage = objectMapper.readTree(
-                    callApi.callApiGet(
-                            imageUrl,
-                            getGlobalTokenAndPort.getToken(),
-                            getGlobalTokenAndPort.getPort(),
-                            null
-                    )
-            );
-
-            String url = "";
-            for (JsonNode ti : typeImage) {
-                if (type.equals("companion") && ti.get("contentId").asText().equals(id)) {
-                    url = ti.get("loadoutsIcon").asText();
-                } else if (type.equals("tftChampions") && ti.get("character_record").get("character_id").asText().equals(id)) {
-                    url = ti.get("character_record").get("squareIconPath").asText();
-                } else if (type.equals("tftitems") && ti.get("nameId").asText().equals(id)) {
-                    url = ti.get("squareIconPath").asText();
-                } else if (type.equals("tfttraits") && ti.get("trait_id").asText().equals(id)) {
-                    url = ti.get("icon_path").asText();
-                }
-            }
-
-            byte[] imageBytes = callApi.callApiGetImage(
-                    url,
-                    getGlobalTokenAndPort.getToken(),
-                    getGlobalTokenAndPort.getPort(),
-                    null);
-
-            String directoryPath = System.getProperty("user.dir") + "/images/" + folderName + "/";
-            Files.createDirectories(Paths.get(directoryPath));
-
-            try (FileOutputStream fos = new FileOutputStream(filePath)) {
-                fos.write(imageBytes);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return folderName + "/" + id + "." + extension;
-    }
 
     public String formatDate(String isoDate) {
         long time = Long.parseLong(isoDate);

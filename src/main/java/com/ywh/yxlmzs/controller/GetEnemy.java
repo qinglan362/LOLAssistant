@@ -76,6 +76,11 @@ public class GetEnemy {
              }
              enemyTea=gameData.get("teamOne");
         }
+
+        if (gameData.get("queue").get("gameMode").asText().equals("CHERRY")){
+            enemyTea=gameData.get("teamOne");
+        }
+
         //取出敌方队伍的puuid
         List<String> enemyPuuIds=new ArrayList<>();
         if (enemyTea != null) {
@@ -83,6 +88,8 @@ public class GetEnemy {
                 enemyPuuIds.add(enemy.get("puuid").asText());
             }
         }
+
+        System.out.println(enemyPuuIds);
 
         List<Champion> champions = allChampions.getList();
 
