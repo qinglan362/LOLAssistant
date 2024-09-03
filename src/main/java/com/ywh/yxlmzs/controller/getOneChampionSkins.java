@@ -36,7 +36,6 @@ public class getOneChampionSkins {
                 getGlobalTokenAndPort.getPort(),
                 null
         )).get("skins");
-        System.out.println(jsonNode.toPrettyString());
 
         String championId=map.get("championId");
         List<ChooseSkinFromChampionId> skinFromChampionIdList=new ArrayList<>();
@@ -65,7 +64,8 @@ public class getOneChampionSkins {
                        String skinId=skinNode.get("id").asText();
                        String name=skinNode.get("name").asText();
                        String path=skinNode.get("splashPath").asText();
-                       String augments =skinNode.get("skinAugments").get("augments").get(0).get("contentId").asText();
+                       String augments =skinNode.get("skinAugments").get
+                               ("augments").get(0).get("contentId").asText();
                        String image=getImage(path,Integer.parseInt(skinId));
                        skinFromChampionIdList.add(new ChooseSkinFromChampionId(championId,skinId,image,name,augments));
                    }

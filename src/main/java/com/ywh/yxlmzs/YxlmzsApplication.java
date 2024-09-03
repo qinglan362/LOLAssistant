@@ -16,7 +16,7 @@ public class YxlmzsApplication {
     @EventListener(ApplicationReadyEvent.class)
     public void openBrowser() {
         try {
-            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://localhost:8089");
+            Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://localhost:8089/index.html");
         } catch (Exception e) {
             e.printStackTrace();
         }
