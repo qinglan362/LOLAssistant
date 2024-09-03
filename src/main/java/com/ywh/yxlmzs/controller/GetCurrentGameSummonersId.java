@@ -48,6 +48,7 @@ public class GetCurrentGameSummonersId {
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode rootNode = objectMapper.readTree(result);
+        System.out.println(rootNode);
 
         JsonNode myTeam=rootNode.get("myTeam");
 

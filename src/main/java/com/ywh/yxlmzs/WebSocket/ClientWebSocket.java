@@ -4,10 +4,8 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.utils.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -56,7 +54,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"));
         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-gameflow_v1_gameflow-phase\"]"));
     }
-    ///lol-champ-select/v1/session/trades/{id}/accept
+
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         CallApi callApi=new CallApi();
@@ -64,14 +62,12 @@ public class ClientWebSocket extends TextWebSocketHandler {
         String  port=getGlobalTokenAndPort.getPort();
         String  token=getGlobalTokenAndPort.getToken();
 
-
-
        if (message.getPayload().contains("/lol-gameflow/v1/gameflow-phase")) {
 
            JSONArray jsonArray = JSONArray.parseArray(message.getPayload());
            JSONObject jsonObject = jsonArray.getJSONObject(2);
            state=jsonObject.getString("data");
-           System.out.println("当前状态:"+state);
+
            if (message.getPayload().contains("Lobby")) {
                if (!Objects.isNull(autoSearchMatch)&&!Objects.isNull(autoSearchMatch.getState())&&!autoSearchMatch.getState().isEmpty()&&autoSearchMatch.getState().equals("true")){
                    while (true){
@@ -105,6 +101,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
                                       }
                                  }
                                  if (count==0){
+                                     System.out.println("开始匹配");
                                      matchMacking();
                                      break;
                                  }
@@ -117,10 +114,42 @@ public class ClientWebSocket extends TextWebSocketHandler {
                if (!Objects.isNull(autoAccecptMatch.getIsAutoAccecptMatch())&&(!autoAccecptMatch.getIsAutoAccecptMatch().isEmpty())&&autoAccecptMatch.getIsAutoAccecptMatch().equals("true")){
                    String Url= "/lol-matchmaking/v1/ready-check/accept";
                    callApi.callApiPost(Url,token,port,null);
-                   System.out.println("自动接受匹配");
+
                }
            }
            if (message.getPayload().contains("ChampSelect")) {
+
+               //自动发送战绩到聊天 暂时待修改
+               String chatId=objectMapper.readTree(callApi.callApiGet(
+                          "/lol-champ-select/v1/session",
+                          token,
+                          port,
+                          null
+               )).get("chatDetails").get("multiUserChatId").asText();
+
+               System.out.println(
+                       callApi.callApiGet(
+                               "/lol-chat/v1/conversations",
+                               token,
+                               port,
+                               null
+                       )
+               );
+               String chatId1=objectMapper.readTree(callApi.callApiGet(
+                          "/lol-chat/v1/conversations",
+                          token,
+                          port,
+                          null
+               )).get(0).get("id").asText();
+
+               System.out.println(callApi.callApiPost(
+                          "/lol-chat/v1/conversations/"+chatId+"/messages",
+                          token,
+                          port,
+                          Map.of("body","hello")
+               ));
+               //自动发送战绩到聊天 暂时待修改
+
                while (state.equals("ChampSelect")) {
 
                    if ((Objects.isNull(autoSwap)||Objects.isNull(autoSwap.getState())||autoSwap.getState().isEmpty()||autoSwap.getState().equals("false"))
@@ -265,3 +294,274 @@ public class ClientWebSocket extends TextWebSocketHandler {
         return true;
     }
 }
+
+
+/**
+ *
+ * package com.ywh.yxlmzs.WebSocket;
+ *
+ * import com.alibaba.fastjson2.JSONArray;
+ * import com.alibaba.fastjson2.JSONObject;
+ * import com.fasterxml.jackson.databind.JsonNode;
+ * import com.fasterxml.jackson.databind.ObjectMapper;
+ * import com.ywh.yxlmzs.utils.*;
+ * import org.springframework.beans.factory.annotation.Autowired;
+ * import org.springframework.stereotype.Component;
+ * import org.springframework.web.socket.CloseStatus;
+ * import org.springframework.web.socket.TextMessage;
+ * import org.springframework.web.socket.WebSocketSession;
+ * import org.springframework.web.socket.handler.TextWebSocketHandler;
+ *
+ * import java.util.Map;
+ * import java.util.Objects;
+ *
+ * @Component
+ * public class ClientWebSocket extends TextWebSocketHandler {
+ *
+ *     private WebSocketSession session;
+ *     private final GetGlobalTokenAndPort getGlobalTokenAndPort;
+ *     private final PickChampionId pickChampionId;
+ *     private final BanChampionId banChampionId;
+ *     private final AutoContinueNextGame autoContinueNextGame;
+ *     private final AutoAccecptMatch autoAccecptMatch;
+ *     private final AutoSearchMatch autoSearchMatch;
+ *     private final AutoSwap autoSwap;
+ *     private String state;
+ *
+ *     @Autowired
+ *     public ClientWebSocket(GetGlobalTokenAndPort getGlobalTokenAndPort,
+ *                            PickChampionId pickChampionId,
+ *                            BanChampionId banChampionId,
+ *                            AutoContinueNextGame autoContinueNextGame,
+ *                            AutoAccecptMatch autoAccecptMatch,
+ *                            AutoSearchMatch autoSearchMatch,
+ *                            AutoSwap autoSwap) {
+ *         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
+ *         this.pickChampionId = pickChampionId;
+ *         this.banChampionId = banChampionId;
+ *         this.autoContinueNextGame = autoContinueNextGame;
+ *         this.autoAccecptMatch = autoAccecptMatch;
+ *         this.autoSearchMatch = autoSearchMatch;
+ *         this.autoSwap = autoSwap;
+ *     }
+ *
+ *     @Override
+ *     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+ *         this.session = session;
+ *         subscribeToEvents();
+ *     }
+ *
+ *     private void subscribeToEvents() throws Exception {
+ *         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-champ-select_v1_session\"]"));
+ *         session.sendMessage(new TextMessage("[5, \"OnJsonApiEvent_lol-gameflow_v1_gameflow-phase\"]"));
+ *     }
+ *
+ *     @Override
+ *     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+ *         CallApi callApi = new CallApi();
+ *         ObjectMapper objectMapper = new ObjectMapper();
+ *         String port = getGlobalTokenAndPort.getPort();
+ *         String token = getGlobalTokenAndPort.getToken();
+ *
+ *         if (message.getPayload().contains("/lol-gameflow/v1/gameflow-phase")) {
+ *             handleGameFlowPhase(message, callApi, objectMapper, port, token);
+ *         }
+ *     }
+ *
+ *     private void handleGameFlowPhase(TextMessage message, CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         JSONArray jsonArray = JSONArray.parseArray(message.getPayload());
+ *         JSONObject jsonObject = jsonArray.getJSONObject(2);
+ *         state = jsonObject.getString("data");
+ *
+ *         if (message.getPayload().contains("Lobby")) {
+ *             handleLobbyPhase(callApi, objectMapper, port, token);
+ *         } else if (message.getPayload().contains("ReadyCheck")) {
+ *             handleReadyCheckPhase(callApi, token, port);
+ *         } else if (message.getPayload().contains("ChampSelect")) {
+ *             handleChampSelectPhase(callApi, objectMapper, port, token);
+ *         } else if (message.getPayload().contains("PreEndOfGame")) {
+ *             handlePreEndOfGamePhase(callApi, token, port);
+ *         } else if (message.getPayload().contains("EndOfGame")) {
+ *             handleEndOfGamePhase(callApi, token, port);
+ *         }
+ *     }
+ *
+ *     private void handleLobbyPhase(CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         if (autoSearchMatch != null && "true".equals(autoSearchMatch.getState())) {
+ *             while (isInLobby(callApi, objectMapper, port, token)) {
+ *                 JsonNode jsonNode = objectMapper.readTree(callApi.callApiGet("/lol-lobby/v2/lobby", token, port, null));
+ *                 if (allMembersReady(jsonNode)) {
+ *                     if (isLeader(jsonNode)) {
+ *                         setPositionPreferences(callApi, token, port, jsonNode);
+ *                         if (allMembersReady(jsonNode)) {
+ *                             matchMacking(callApi, token, port);
+ *                             break;
+ *                         }
+ *                     }
+ *                 }
+ *             }
+ *         }
+ *     }
+ *
+ *     private boolean isInLobby(CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         return "Lobby".equals(objectMapper.readTree(callApi.callApiGet("/lol-gameflow/v1/gameflow-phase", token, port, null)).asText());
+ *     }
+ *
+ *     private boolean allMembersReady(JsonNode jsonNode) {
+ *         JsonNode invitations = jsonNode.get("invitations");
+ *         int members = invitations.size();
+ *         for (JsonNode jn : invitations) {
+ *             if (!"Pending".equals(jn.get("state").asText())) {
+ *                 members--;
+ *             }
+ *         }
+ *         return members == 0;
+ *     }
+ *
+ *     private boolean isLeader(JsonNode jsonNode) {
+ *         return "true".equals(jsonNode.get("localMember").get("isLeader").asText());
+ *     }
+ *
+ *     private void setPositionPreferences(CallApi callApi, String token, String port, JsonNode jsonNode) throws Exception {
+ *         if ("true".equals(jsonNode.get("gameConfig").get("showPositionSelector").asText())) {
+ *             Map<String, Object> map = Map.of("firstPreference", autoSearchMatch.getFirstPosition(), "secondPreference", autoSearchMatch.getSecondPosition());
+ *             callApi.callApiPut("/lol-lobby/v2/lobby/members/localMember/position-preferences", token, port, map);
+ *         }
+ *     }
+ *
+ *     private void handleReadyCheckPhase(CallApi callApi, String token, String port) throws Exception {
+ *         if (autoAccecptMatch != null && "true".equals(autoAccecptMatch.getIsAutoAccecptMatch())) {
+ *             callApi.callApiPost("/lol-matchmaking/v1/ready-check/accept", token, port, null);
+ *         }
+ *     }
+ *
+ *     private void handleChampSelectPhase(CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         String chatId = getChatId(callApi, objectMapper, port, token);
+ *         sendMessageToChat(callApi, token, port, chatId, "hello");
+ *
+ *         while ("ChampSelect".equals(state)) {
+ *             if (shouldStopChampSelect()) break;
+ *             handleAutoSwap(callApi, objectMapper, port, token);
+ *             handlePickOrBan(callApi, objectMapper, port, token);
+ *         }
+ *     }
+ *
+ *     private String getChatId(CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         return objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null))
+ *                 .get("chatDetails").get("multiUserChatId").asText();
+ *     }
+ *
+ *     private void sendMessageToChat(CallApi callApi, String token, String port, String chatId, String message) throws Exception {
+ *         callApi.callApiPost("/lol-chat/v1/conversations/" + chatId + "/messages", token, port, Map.of("body", message));
+ *     }
+ *
+ *     private boolean shouldStopChampSelect() {
+ *         return (autoSwap == null || "false".equals(autoSwap.getState())) &&
+ *                 (pickChampionId == null || "stop".equals(pickChampionId.getState())) &&
+ *                 (banChampionId == null || "stop".equals(banChampionId.getState()));
+ *     }
+ *
+ *     private void handleAutoSwap(CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         if (autoSwap != null && "true".equals(autoSwap.getState())) {
+ *             JsonNode jsonNode = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
+ *             if (!jsonNode.get("pickOrderSwaps").isEmpty()) {
+ *                 for (JsonNode swap : jsonNode.get("pickOrderSwaps")) {
+ *                     if ("RECEIVED".equals(swap.get("state").asText())) {
+ *                         acceptSwap(callApi, token, port, swap);
+ *                     }
+ *                 }
+ *             }
+ *         }
+ *     }
+ *
+ *     private void acceptSwap(CallApi callApi, String token, String port, JsonNode swap) throws Exception {
+ *         callApi.callApiPost("/lol-champ-select/v1/session/trades/" + swap.get("id").asInt() + "/accept", token, port, null);
+ *         callApi.callApiPost("/lol-champ-select/v1/session/trades/" + swap.get("cellId").asInt() + "/accept", token, port, null);
+ *     }
+ *
+ *     private void handlePickOrBan(CallApi callApi, ObjectMapper objectMapper, String port, String token) throws Exception {
+ *         if (shouldPickOrBan()) {
+ *             JsonNode jsonNode = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
+ *             if (isFinalizationPhase(jsonNode)) return;
+ *             if (isBanPickPhase(jsonNode)) {
+ *                 processActions(callApi, token, port, jsonNode);
+ *             }
+ *         }
+ *     }
+ *
+ *     private boolean shouldPickOrBan() {
+ *         return (pickChampionId != null && "start".equals(pickChampionId.getState())) ||
+ *                 (banChampionId != null && "start".equals(banChampionId.getState()));
+ *     }
+ *
+ *     private boolean isFinalizationPhase(JsonNode jsonNode) {
+ *         return jsonNode.get("timer") != null &&
+ *                 ("FINALIZATION".equals(jsonNode.get("timer").get("phase").asText()) ||
+ *                         "GAME_STARTING".equals(jsonNode.get("timer").get("phase").asText()));
+ *     }
+ *
+ *     private boolean isBanPickPhase(JsonNode jsonNode) {
+ *         return jsonNode.get("timer") != null && "BAN_PICK".equals(jsonNode.get("timer").get("phase").asText());
+ *     }
+ *
+ *     private void processActions(CallApi callApi, String token, String port, JsonNode jsonNode) throws Exception {
+ *         JsonNode actions = jsonNode.get("actions");
+ *         int cellId = jsonNode.get("localPlayerCellId").asInt();
+ *         for (JsonNode subArray : actions) {
+ *             for (JsonNode action : subArray) {
+ *                 if (action.get("actorCellId").asInt() == cellId && "false".equals(action.get("completed").asText())) {
+ *                     if ("pick".equals(action.get("type").asText()) && "start".equals(pickChampionId.getState())) {
+ *                         executeAction(callApi, token, port, cellId, action, pickChampionId.getChampionId(), "pick");
+ *                     } else if ("ban".equals(action.get("type").asText()) && "start".equals(banChampionId.getState())) {
+ *                         executeAction(callApi, token, port, cellId, action, banChampionId.getChampionId(), "ban");
+ *                     }
+ *                 }
+ *             }
+ *         }
+ *     }
+ *
+ *     private void executeAction(CallApi callApi, String token, String port, int cellId, JsonNode action, int championId, String type) throws Exception {
+ *         Map<String, Object> map = Map.of(
+ *                 "actorCellId", cellId,
+ *                 "championId", championId,
+ *                 "completed", "true",
+ *                 "id", action.get("id").asText(),
+ *                 "isAllyAction", "true",
+ *                 "type", type
+ *         );
+ *         callApi.callApiPatch("/lol-champ-select/v1/session/actions/" + action.get("id").asInt(), token, port, map);
+ *     }
+ *
+ *     private void handlePreEndOfGamePhase(CallApi callApi, String token, String port) throws Exception {
+ *         if (autoContinueNextGame != null && "true".equals(autoContinueNextGame.getAutoContinueNextGame())) {
+ *             callApi.callApiPost("/lol-honor-v2/v1/honor-player", token, port, Map.of("honorCategory", ""));
+ *         }
+ *     }
+ *
+ *     private void handleEndOfGamePhase(CallApi callApi, String token, String port) throws Exception {
+ *         if (autoContinueNextGame != null && "true".equals(autoContinueNextGame.getAutoContinueNextGame())) {
+ *             callApi.callApiPost("/lol-lobby/v2/play-again", token, port, null);
+ *         }
+ *     }
+ *
+ *     @Override
+ *     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+ *         System.out.println("Connection closed: " + session.getId());
+ *     }
+ *
+ *     public void subscribe(String subscribeMessage) throws Exception {
+ *         session.sendMessage(new TextMessage(subscribeMessage));
+ *         System.out.println("订阅成功: " + subscribeMessage);
+ *     }
+ *
+ *     public void unsubscribe(String unsubscribeMessage) throws Exception {
+ *         session.sendMessage(new TextMessage(unsubscribeMessage));
+ *         System.out.println("取消订阅成功: " + unsubscribeMessage);
+ *     }
+ *
+ *     public boolean matchMacking(CallApi callApi, String token, String port) throws Exception {
+ *         JsonNode jsonNode = new ObjectMapper().readTree(callApi.callApiPost("/lol-lobby/v2/lobby/matchmaking/search", token, port, null));
+ *         return jsonNode.get("message") == null || !"GATEKEEPER_RESTRICTED".equals(jsonNode.get("message").asText());
+ *     }
+ * }
+ */

@@ -1,10 +1,25 @@
 <script setup>
-import { ref } from 'vue'
+import { ref} from 'vue'
+import $ from 'jquery'
 const activeIndex = ref('1')
 const handleSelect = (key, keyPath) => {
   console.log(key, keyPath);
 };
-
+const avatar=ref('')
+const imageInfoSrc = (base64Image) => {
+  return `http://localhost:8089/images/${base64Image}`;
+};
+const getAvatar=()=>{
+   $.ajax({
+    url: 'http://localhost:8089/getCurrentInfo',
+    type: 'GET',
+    success(data) {
+      console.log(data)
+       avatar.value=imageInfoSrc(data.profileIconId)
+    }}
+   )
+}
+getAvatar()
 </script>
 
 <template>
@@ -24,6 +39,13 @@ const handleSelect = (key, keyPath) => {
        工具
     </el-menu-item>
     </router-link>
+    <el-menu-item index="3" >
+      <el-avatar :size="60" src="https://empty" @error="errorHandler">
+        <img
+           :src="avatar"
+        />
+      </el-avatar>
+    </el-menu-item>
   </el-menu>
 </template>
 
