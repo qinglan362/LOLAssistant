@@ -37,9 +37,13 @@ public class getOneChampionSkins {
                 null
         )).get("skins");
 
+        System.out.println(jsonNode);
+
         String championId=map.get("championId");
         List<ChooseSkinFromChampionId> skinFromChampionIdList=new ArrayList<>();
-        for (int i = 1; i < jsonNode.size(); i++) {
+        for (int i = 0; i < jsonNode.size(); i++) {
+            //从0开始包含原画 从1开始不包含原画全是皮肤 但是无尽狂潮的英雄只有一个皮肤没有原画，或者说原画就是皮肤
+            //无尽狂潮已经下线 不知道何时上线
             JsonNode skinNode=jsonNode.get(i);
             if (!Objects.isNull(skinNode.get("questSkinInfo"))){
                 if (!Objects.isNull(skinNode.get("questSkinInfo").get("tiers"))){
@@ -75,6 +79,10 @@ public class getOneChampionSkins {
                 String name=skinNode.get("name").asText();
                 String path=skinNode.get("splashPath").asText();
                 String image=getImage(path,Integer.parseInt(skinId));
+                System.out.println(image);
+                System.out.println(skinId);
+                System.out.println(name);
+                System.out.println("!1111");
                 skinFromChampionIdList.add(new ChooseSkinFromChampionId(championId,skinId,image,name,""));
             }
         }

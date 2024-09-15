@@ -59,8 +59,6 @@ public class MatchOneTFTDetail {
         //{currentPage=1, index=0}
         int begIndex=(Integer.parseInt(data.get("currentPage"))-1)*18+Integer.parseInt(data.get("index"));
 
-        //tag也可以作为参数
-        //好像不好用呢
 
         Map<String, Object> map1 = Map.of("begin", begIndex, "count", 1);
 
@@ -74,6 +72,8 @@ public class MatchOneTFTDetail {
                         map1
                 )
         ).get("games");
+           //小茶狐#33355
+         System.out.println(gamesJSON);
 
             JsonNode json=gamesJSON.get(0).get("json");
             JsonNode tags=gamesJSON.get(0).get("metadata").get("tags");
@@ -150,7 +150,6 @@ public class MatchOneTFTDetail {
                      );
 
                     if (!itemName.isEmpty()){
-                        System.out.println(itemName);
                         List<String> itemIds = new ArrayList<>(itemName);
                          imageAndMessage.setItemImage(saveImages.saveImage(
                                     tftItems,
@@ -193,7 +192,6 @@ public class MatchOneTFTDetail {
                             traitsImage.add(trait.get("name").asText());
                       }
                 }
-                System.out.println(traitsImage);
                 tftOneMatchDetail.setTraits(saveImages.saveImage(
                         traitsJson,
                         traitsImage,

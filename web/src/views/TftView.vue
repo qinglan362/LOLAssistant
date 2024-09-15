@@ -77,6 +77,9 @@ const returnGameModeName= (val)=>{
  if (val[1]==="turbo"){
    return "狂暴模式"
  }
+ if (val[1]==="pve"){
+   return "发条鸟的试炼"
+ }
 }
 //点击名字再搜索他
 const handleGameNameClick = (gameName) => {
@@ -96,47 +99,51 @@ const imageInfoSrc = (base64Image) => {
 //     }
 //   }
 // }
-const moshi = [
-  {
-    value: 'all',
-    label: '全部模式',
-  },
-  {
-    value: 'turbo',
-    label: '狂暴模式',
-  },
-  {
-    value: 'pairs',
-    label: '双人作战',
-  },
-  {
-    value: 'ranked',
-    label: '排位赛',
-  },
-  {
-    value: 'normal',
-    label: '匹配赛',
-  },
-]
+// const moshi = [
+//   {
+//     value: 'all',
+//     label: '全部模式',
+//   },
+//   {
+//     value: 'turbo',
+//     label: '狂暴模式',
+//   },
+//   {
+//     value: 'pairs',
+//     label: '双人作战',
+//   },
+//   {
+//     value: 'ranked',
+//     label: '排位赛',
+//   },
+//   {
+//     value: 'normal',
+//     label: '匹配赛',
+//   },
+//   {
+//     value: 'pve',
+//     label: '发条鸟的试炼',
+//   }
+// ]
 const  chooseMoshi=ref('全部')
 </script>
 
 <template>
   <div class="input-container">
     <el-input v-model="name" style="width: 150px" placeholder="请输入ID"></el-input>
-    <el-select
-        v-model="chooseMoshi"
-        placeholder="Select"
-        size="large"
-        style="width: 240px;margin-left: 20px"
-    >
-      <el-option
-          v-for="item in moshi"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-      />
-    </el-select>
+<!--    <el-select-->
+<!--        v-model="chooseMoshi"-->
+<!--        placeholder="Select"-->
+<!--        size="large"-->
+<!--        style="width: 240px;margin-left: 20px"-->
+<!--    >-->
+<!--      <el-option-->
+<!--          v-for="item in moshi"-->
+<!--          :key="item.value"-->
+<!--          :label="item.label"-->
+<!--          :value="item.value"-->
+<!--      />-->
+<!--    </el-select>-->
     <el-button type="primary" @click="getInfo">获取该人云顶之弈战绩</el-button>
     <h4 style="margin-left: 50px">获取战绩可能有2-4秒延迟</h4>
   </div>

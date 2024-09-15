@@ -52,7 +52,7 @@ public class GetCurrentGameSummonersId {
 
         JsonNode myTeam=rootNode.get("myTeam");
 
-       String myselfPuuid=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v1/current-summoner",token,port,null)).get("puuid").asText();
+        String myselfPuuid=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v1/current-summoner",token,port,null)).get("puuid").asText();
 
         if (myTeam.isArray()) {
             for (JsonNode summonerNode : myTeam) {

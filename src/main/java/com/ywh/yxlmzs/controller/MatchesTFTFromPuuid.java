@@ -48,8 +48,9 @@ public class MatchesTFTFromPuuid {
 
         int begIndex=(page-1)*18;
 
-
-        //tag也可以作为参数
+        //tag也可以作为参数传入
+        //TX你搞得什么SB接口，tag参数API中有但是不好用，WQNMDTX
+        //浪费你爹时间 TXWCNMD
         Map<String, Object> param ;
         param = Map.of("begin", begIndex, "count", 18);
 
@@ -87,6 +88,7 @@ public class MatchesTFTFromPuuid {
             }
             tftMatchesListInfos.add(tftMatchesListInfo);
         }
+        System.out.println(tftMatchesListInfos);
         return tftMatchesListInfos;
 
     }

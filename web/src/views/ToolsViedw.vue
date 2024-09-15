@@ -1198,6 +1198,23 @@ const setutoSwap=()=>{
     }
   });
 }
+const sendTeamMatch=()=>{
+  store.state.autoSendMatch=!store.state.autoSendMatch
+  $.ajax({
+    url: "http://localhost:8089/sendTeamMatch",
+    type: "Post",
+    data: {
+      setAutoSendTeamMatch: store.state.autoSendMatch
+    },
+    success(resp) {
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
 </script>
 
 <template>
@@ -1294,6 +1311,10 @@ const setutoSwap=()=>{
                 :value="item.value"
             />
           </el-select>
+      </div>
+      <div style="margin-top: 20px">
+        <el-button v-if="!store.state.autoSendMatch" type="primary" @click="sendTeamMatch">聊天发送队友战绩</el-button>
+        <el-button v-else type="danger" @click="sendTeamMatch">取消聊天发送队友战绩</el-button>
       </div>
     </el-col>
     <el-col :span="6">

@@ -12,6 +12,7 @@ export default createStore({
     firstPosition: "MIDDLE",
     secondPosition: "JUNGLE",
     autoSwap: false,
+    autoSendMatch: false,
   },
   getters: {
     getIsAutoAccept: state => state.isAutoAccept,
@@ -23,6 +24,7 @@ export default createStore({
     getFirstPosition: state => state.firstPosition,
     getSecondPosition: state => state.secondPosition,
     getAutoSwap: state => state.autoSwap,
+    getAutoSendMatch: state => state.autoSendMatch,
   },
   mutations: {
     setSsAutoAccept(state, value) {
@@ -51,6 +53,9 @@ export default createStore({
     },
     setAutoSwap(state, value) {
       state.autoSwap = value
+    },
+    setAutoSendMatch(state, value) {
+      state.autoSendMatch = value
     }
   },
     actions: {
@@ -80,6 +85,9 @@ export default createStore({
         },
         updateAutoSwap({commit}, value) {
           commit('setAutoSwap', value);
+        },
+        updateAutoSendMatch({commit}, value) {
+          commit('setAutoSendMatch', value);
         }
     },
   modules: {

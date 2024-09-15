@@ -23,6 +23,7 @@ public class WebSocketRegistrationService {
     private AutoAccecptMatch autoAccecptMatch;
     private AutoSearchMatch autoSearchMatch;
     private AutoSwap autoSwap;
+    private SendTeamMatch sendTeamMatch;
 
     @Autowired
     public WebSocketRegistrationService(GetGlobalTokenAndPort getGlobalTokenAndPort,
@@ -31,7 +32,8 @@ public class WebSocketRegistrationService {
                                         AutoContinueNextGame autoContinueNextGame,
                                         AutoAccecptMatch autoAccecptMatch,
                                         AutoSearchMatch autoSearchMatch,
-                                        AutoSwap autoSwap
+                                        AutoSwap autoSwap,
+                                        SendTeamMatch sendTeamMatch
                                         ) {
         this.getGlobalTokenAndPort = getGlobalTokenAndPort;
         this.pickChampionId=pickChampionId;
@@ -40,6 +42,7 @@ public class WebSocketRegistrationService {
         this.autoAccecptMatch=autoAccecptMatch;
         this.autoSearchMatch=autoSearchMatch;
         this.autoSwap=autoSwap;
+        this.sendTeamMatch=sendTeamMatch;
     }
 
     @Getter
@@ -60,7 +63,7 @@ public class WebSocketRegistrationService {
         client.getUserProperties().put("org.apache.tomcat.websocket.SSL_CONTEXT", sslContext);
 
 
-        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId,banChampionId,autoContinueNextGame,autoAccecptMatch,autoSearchMatch,autoSwap);
+        clientWebSocket = new ClientWebSocket(getGlobalTokenAndPort,pickChampionId,banChampionId,autoContinueNextGame,autoAccecptMatch,autoSearchMatch,autoSwap,sendTeamMatch);
         WebSocketConnectionManager manager = new WebSocketConnectionManager(client, clientWebSocket, path);
 
         // 添加Basic Auth认证信息到Header中
