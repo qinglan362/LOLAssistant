@@ -321,7 +321,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
         if (myTeam.isArray()) {
             for (JsonNode summonerNode : myTeam) {
                 if (!Objects.equals(summonerNode.get("puuid").asText(), "")) {
+                    if (!Objects.equals(summonerNode.get("puuid").asText(), myselfPuuid)){
                         puuids.add(summonerNode.get("puuid").asText());
+                    }
                 }
             }
         }
@@ -339,6 +341,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
             Map<String, Object> params = new HashMap<>();
             params.put("begIndex", "0");
             params.put("endIndex", "4");
+
             JsonNode games = objectMapper.readTree(callApi.callApiGet(matchUrl, token, port, params)).get("games").get("games");
 
             List<String> gameIds= new ArrayList<>();
