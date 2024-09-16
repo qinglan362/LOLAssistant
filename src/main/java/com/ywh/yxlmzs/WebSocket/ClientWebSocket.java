@@ -116,6 +116,8 @@ public class ClientWebSocket extends TextWebSocketHandler {
                                      matchMacking();
                                      break;
                                  }
+                           }else{
+                               break;
                            }
                        }
                    }
@@ -128,6 +130,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
 
                }
            }
+
+           int sendMatch=0;
+
            if (message.getPayload().contains("ChampSelect")) {
 
                while (state.equals("ChampSelect")) {
@@ -135,25 +140,22 @@ public class ClientWebSocket extends TextWebSocketHandler {
                    boolean flag=true;
 
                    if (!Objects.isNull(sendTeamMatch)&&!Objects.isNull(sendTeamMatch.getState())&&sendTeamMatch.getState().equals("true")){
-                       while (flag){
-                           JsonNode chatNodes = objectMapper.readTree(
-                                   callApi.callApiGet(
-                                           "/lol-chat/v1/conversations",
-                                           token,
-                                           port,
-                                           null
-                                   )
-                           );
-                           for (JsonNode chatNode : chatNodes) {
-                               if (chatNode.get("type").asText().equals("championSelect")) {
-                                   String body=getCurrentGameSummonersId(token,port,callApi);
-                                   System.out.println(callApi.callApiPost(
-                                           "/lol-chat/v1/conversations/" + chatNode.get("id").asText() + "/messages",
-                                           token,
-                                           port,
-                                           Map.of("body", body)
-                                   ));
-                                   flag=false;
+                       if (sendMatch==0) {
+                           while (flag) {
+                               JsonNode chatNodes = objectMapper.readTree(
+                                       callApi.callApiGet(
+                                               "/lol-chat/v1/conversations",
+                                               token,
+                                               port,
+                                               null
+                                       )
+                               );
+                               for (JsonNode chatNode : chatNodes) {
+                                   if (chatNode.get("type").asText().equals("championSelect")) {
+                                       getCurrentGameSummonersId(token, port, callApi,chatNode.get("id").asText());
+                                       flag = false;
+                                       sendMatch++;
+                                   }
                                }
                            }
                        }
@@ -170,7 +172,8 @@ public class ClientWebSocket extends TextWebSocketHandler {
                        if (!Objects.isNull(autoSwap.getState())&&!autoSwap.getState().isEmpty()){
                            if (autoSwap.getState().equals("true")){
                                JsonNode jsonNodeAccecptSwap = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
-                               if (!jsonNodeAccecptSwap.get("pickOrderSwaps").isEmpty()){
+                               if (! jsonNodeAccecptSwap.get("pickOrderSwaps").isEmpty()){
+                                   System.out.println("jsonNodeAccecptSwap = " + jsonNodeAccecptSwap);
                                    for (JsonNode jsonNode:jsonNodeAccecptSwap.get("pickOrderSwaps")){
                                        if (jsonNode.get("state").asText().equals("RECEIVED")){
                                            //还不好用
@@ -198,7 +201,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
                        if (!Objects.isNull(jsonNode.get("message")) &&(jsonNode.get("message").asText().equals("No active delegate")||jsonNode.get("errorCode").asText().equals("RPC_ERROR"))){
                            break;
                        }
-                       //phase:PLANING
+
                        if (!Objects.isNull(jsonNode.get("timer"))) {
                            if ((!Objects.isNull(jsonNode.get("timer"))&&
                                    !Objects.isNull(jsonNode.get("timer").get("phase"))&&
@@ -301,7 +304,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
         }
         return true;
     }
-    public String getCurrentGameSummonersId(String token,String port,CallApi callApi) throws IOException {
+    public void getCurrentGameSummonersId(String token,String port,CallApi callApi,String id) throws IOException {
 
         List<String> puuids=new ArrayList<>();
         String url="/lol-champ-select/v1/session";
@@ -329,7 +332,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
 
             OnePersonHistory onePersonHistory = new OnePersonHistory();
             JsonNode current=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v2/summoners/puuid/"+puuid,token,port,null));
-            onePersonHistory.setName(current.get("gameName").asText()+"#"+current.get("tagLine").asText());
+            onePersonHistory.setName(current.get("gameName").asText());
 
             List<MatchSimple> matchSimples = new ArrayList<>();
             String matchUrl = "/lol-match-history/v1/products/lol/" + puuid + "/matches";
@@ -359,19 +362,25 @@ public class ClientWebSocket extends TextWebSocketHandler {
                 }
             }
             onePersonHistory.setOneHistory(matchSimples);
-            AllMyTeamMatchRecords.add(onePersonHistory);
-        }
-        System.out.println(AllMyTeamMatchRecords.toString());
-        String body="";
-        for (int i=0;i<AllMyTeamMatchRecords.size();i++){
-            body+="召唤师:"+AllMyTeamMatchRecords.get(i).getName()+" ";
-            body+="比赛记录:";
-            for (int j=0;j<AllMyTeamMatchRecords.get(i).getOneHistory().size();j++){
-                body+=AllMyTeamMatchRecords.get(i).getOneHistory().get(j).getKills()+"/"+AllMyTeamMatchRecords.get(i).getOneHistory().get(j).getDeaths()+"/"+AllMyTeamMatchRecords.get(i).getOneHistory().get(j).getAssists()+"  ";
+            String name="玩家:";
+            String match="战绩:";
+            name+=onePersonHistory.getName();
+            System.out.println(callApi.callApiPost(
+                    "/lol-chat/v1/conversations/" +id + "/messages",
+                    token,
+                    port,
+                    Map.of("body",name)
+            ));
+            for (int i=0;i<onePersonHistory.getOneHistory().size();i++){
+                match+="("+onePersonHistory.getOneHistory().get(i).getKills()+"/"+onePersonHistory.getOneHistory().get(i).getDeaths()+"/"+onePersonHistory.getOneHistory().get(i).getAssists()+")"+"  ";
             }
-            body+="\n";
+            System.out.println(callApi.callApiPost(
+                    "/lol-chat/v1/conversations/" +id + "/messages",
+                    token,
+                    port,
+                    Map.of("body",match)
+            ));
         }
-        return body;
     }
     public String getGameFromGameId(String gameId,CallApi callApi) throws IOException {
         String url = "/lol-match-history/v1/games/" + gameId;
