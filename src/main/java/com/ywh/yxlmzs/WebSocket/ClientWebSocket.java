@@ -304,7 +304,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
         }
         return true;
     }
-    public void getCurrentGameSummonersId(String token,String port,CallApi callApi,String id) throws IOException {
+    public void getCurrentGameSummonersId(String token,String port,CallApi callApi,String id) throws IOException, InterruptedException {
 
         List<String> puuids=new ArrayList<>();
         String url="/lol-champ-select/v1/session";
@@ -368,21 +368,17 @@ public class ClientWebSocket extends TextWebSocketHandler {
             String name="玩家:";
             String match="战绩:";
             name+=onePersonHistory.getName();
-            System.out.println(callApi.callApiPost(
-                    "/lol-chat/v1/conversations/" +id + "/messages",
-                    token,
-                    port,
-                    Map.of("body",name)
-            ));
             for (int i=0;i<onePersonHistory.getOneHistory().size();i++){
-                match+="("+onePersonHistory.getOneHistory().get(i).getKills()+"/"+onePersonHistory.getOneHistory().get(i).getDeaths()+"/"+onePersonHistory.getOneHistory().get(i).getAssists()+")"+"  ";
+                int j=i+1;
+                match+="第"+j+"局"+"("+onePersonHistory.getOneHistory().get(i).getKills()+"/"+onePersonHistory.getOneHistory().get(i).getDeaths()+"/"+onePersonHistory.getOneHistory().get(i).getAssists()+")"+"   ";
             }
             System.out.println(callApi.callApiPost(
                     "/lol-chat/v1/conversations/" +id + "/messages",
                     token,
                     port,
-                    Map.of("body",match)
+                    Map.of("body",name+"  "+match)
             ));
+            sleep(1000);
         }
     }
     public String getGameFromGameId(String gameId,CallApi callApi) throws IOException {
