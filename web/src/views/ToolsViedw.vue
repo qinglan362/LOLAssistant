@@ -310,7 +310,6 @@ const autoNextGame=()=>{
 const imageInfoSrc = (base64Image) => {
   console.log(base64Image)
   return `http://localhost:8089/images/${base64Image}`;
- // return `data:image/jpeg;base64,${base64Image}`;
 };
 //
 const checkName=ref('')
@@ -339,6 +338,8 @@ const  CheckName=()=>{
 const dialogTableVisible2=ref(false)
 const dialogTableVisible3=ref(false)
 const chooseChampionForChooseSkin=ref('')
+//查看需要查看炫彩的英雄
+const chooseChampionForChooseSkinChorms=ref('')
 const allChampionsSkins=ref([])
 const chooseWantChangeSkin=ref([])
 const chooseSkinName=ref('')
@@ -353,6 +354,27 @@ const getOneChampionSkin=()=>{
     },
     success(resp) {
       allChampionsSkins.value=resp
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error(resp.msg);
+    }
+  });
+}
+
+const allChampionsSkinsChorms=ref([])
+const dialogTableVisiblexuancai2=ref(false)
+const getOneChampionSkinChorms=()=>{
+  dialogTableVisiblexuancai2.value=true
+  $.ajax({
+    url: "http://localhost:8089/getOwnXuancai",
+    type: "Get",
+    data: {
+      championId: chooseChampionForChooseSkinChorms.value
+    },
+    success(resp) {
+      allChampionsSkinsChorms.value=resp
       console.log(resp);
     },
     error(resp) {
@@ -1215,6 +1237,7 @@ const sendTeamMatch=()=>{
     }
   });
 }
+const dialogTableVisiblexuancai=ref(false)
 </script>
 
 <template>
@@ -1397,6 +1420,52 @@ const sendTeamMatch=()=>{
         <el-button  v-if="store.state.autoSwap===false" type="primary" @click="setutoSwap">自动交换位置</el-button>
         <el-button v-if="store.state.autoSwap===true" @click="setutoSwap" type="danger" round>取消自动交换位置</el-button>
       </div>
+      <div style="margin-top: 20px">
+        <el-button type="primary" @click="dialogTableVisiblexuancai=true">查看炫彩</el-button>
+        <el-dialog v-model="dialogTableVisiblexuancai" title="选择英雄" width="350">
+          <el-select
+              v-model="chooseChampionForChooseSkinChorms"
+              filterable
+              placeholder="Select"
+              style="width: 240px"
+          >
+            <el-option
+                v-for="item in store.state.champions"
+                :key="item.key"
+                :label="item.name"
+                :value="item.key"
+            />
+          </el-select>
+          <el-button style="margin-top: 20px" v-if="chooseChampionForChooseSkinChorms!==''" type="primary" @click="getOneChampionSkinChorms">查看该英雄所有已拥有皮肤的已拥有炫彩</el-button>
+        </el-dialog>
+        <el-dialog v-model="dialogTableVisiblexuancai2" title="查看炫彩" width="1500">
+          <el-row>
+            <el-col
+                v-for="(item,index) in allChampionsSkinsChorms"
+                :key=index
+                :span="4"
+            >
+              <el-row>
+                <el-col :span="12">
+                  <img
+                      :src="imageInfoSrc(item.image)"
+                      :class="{ 'selected-image': isImageSelected1(item) }"
+                      style="width: 100%; height: 100px; cursor: pointer;"
+                      alt=""
+                  >
+                </el-col>
+                <el-col :span="12">
+                  <div style="margin-left: 15px">
+                    <div style="width: 100%;margin-top: 50%">
+                      {{item.toolTips}}
+                    </div>
+                  </div>
+                </el-col>
+              </el-row>
+            </el-col>
+          </el-row>
+        </el-dialog>
+      </div>
     </el-col>
     <el-col :span="6">
       <div>
@@ -1434,7 +1503,6 @@ const sendTeamMatch=()=>{
       </div>
     </el-col>
   </el-row>
-<!--  分解战利品对话框-->
   <el-dialog v-model="dialogTableVisibleRecipes" title="分解战利品" width="1500">
     <el-row>
       <el-col

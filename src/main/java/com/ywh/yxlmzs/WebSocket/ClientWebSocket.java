@@ -173,18 +173,25 @@ public class ClientWebSocket extends TextWebSocketHandler {
                            if (autoSwap.getState().equals("true")){
                                JsonNode jsonNodeAccecptSwap = objectMapper.readTree(callApi.callApiGet("/lol-champ-select/v1/session", token, port, null));
                                if (! jsonNodeAccecptSwap.get("pickOrderSwaps").isEmpty()){
-                                   System.out.println("jsonNodeAccecptSwap = " + jsonNodeAccecptSwap);
                                    for (JsonNode jsonNode:jsonNodeAccecptSwap.get("pickOrderSwaps")){
                                        if (jsonNode.get("state").asText().equals("RECEIVED")){
                                            //还不好用
+                //{"cellId":0,"id":15,"state":"RECEIVED"}
+                                           /*
+                                               # 同意交换
+    @retry()
+    async def acceptTrade(self, id):
+        res = await self.__post(f"/lol-champ-select/v1/session/trades/{id}/accept")
+        return await res.json()
+
+    # 备战席交换
+    async def benchSwap(self, championId):
+        res = await self.__post(f"/lol-champ-select/v1/session/bench/swap/{championId}")
+        return await res.json()
+                                            */
+                                           System.out.println(jsonNode);
                                            System.out.println(callApi.callApiPost(
                                                    "/lol-champ-select/v1/session/trades/"+jsonNode.get("id").asInt()+"/accept",
-                                                   token,
-                                                   port,
-                                                   null
-                                           ));
-                                           System.out.println(callApi.callApiPost(
-                                                   "/lol-champ-select/v1/session/trades/"+jsonNode.get("cellId").asInt()+"/accept",
                                                    token,
                                                    port,
                                                    null
@@ -330,6 +337,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
 
         List<OnePersonHistory> AllMyTeamMatchRecords = new ArrayList<>();
 
+        int kk=0;
         for (String puuid : puuids) {
 
             OnePersonHistory onePersonHistory = new OnePersonHistory();
@@ -365,20 +373,28 @@ public class ClientWebSocket extends TextWebSocketHandler {
                 }
             }
             onePersonHistory.setOneHistory(matchSimples);
-            String name="玩家:";
-            String match="战绩:";
+            String name="";
+            String match="";
             name+=onePersonHistory.getName();
             for (int i=0;i<onePersonHistory.getOneHistory().size();i++){
-                int j=i+1;
-                match+="第"+j+"局"+"("+onePersonHistory.getOneHistory().get(i).getKills()+"/"+onePersonHistory.getOneHistory().get(i).getDeaths()+"/"+onePersonHistory.getOneHistory().get(i).getAssists()+")"+"   ";
+                match+="("+onePersonHistory.getOneHistory().get(i).getKills()+"/"+onePersonHistory.getOneHistory().get(i).getDeaths()+"/"+onePersonHistory.getOneHistory().get(i).getAssists()+")"+"||||";
             }
+            kk++;
             System.out.println(callApi.callApiPost(
+
                     "/lol-chat/v1/conversations/" +id + "/messages",
                     token,
                     port,
-                    Map.of("body",name+"  "+match)
+                    Map.of("body",name+" "+match)
             ));
-            sleep(1000);
+            if (kk==onePersonHistory.getOneHistory().size()){
+                System.out.println(callApi.callApiPost(
+                        "/lol-chat/v1/conversations/" +id + "/messages",
+                        token,
+                        port,
+                        Map.of("body",name+" "+match)
+                ));
+            }
         }
     }
     public String getGameFromGameId(String gameId,CallApi callApi) throws IOException {
