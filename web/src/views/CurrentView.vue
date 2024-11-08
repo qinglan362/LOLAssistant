@@ -5,6 +5,7 @@ import $ from "jquery";
 
 const All = ref([]);
 
+const side=ref('');
 
 const getData = () => {
   $.ajax({
@@ -20,9 +21,23 @@ const getData = () => {
     }
   });
 };
+const getBlueRed = () => {
+  $.ajax({
+    url: "http://localhost:8089/getBlueRed",
+    type: "GET",
+    success(resp) {
+      side.value=resp;
+      console.log(resp);
+    },
+    error(resp) {
+      console.log(resp);
+      ElMessage.error("没有红蓝方数据");
+    }
+  });
+};
 
 getData();
-
+getBlueRed();
 const imageInfoSrc = (base64Image) => {
   return `http://localhost:8089/images/${base64Image}`;
 };
@@ -38,9 +53,19 @@ const getBackgorundColor = ({row}) => {
       ? 'background: linear-gradient(to right, rgb(161,219,227), white)'
       : 'background: linear-gradient(to right, rgb(235,165,165), white)';
 };
+const getSides=()=>{
+  if (side.value==='blue'){
+    return "此局您在蓝色方，泉水在左下角"
+  }else{
+    return "此局您在红色方，泉水在右上角"
+  }
+}
 </script>
 
 <template>
+  <div style="text-align: center">
+   {{getSides()}}
+  </div>
   <el-row :gutter="24">
     <el-col :span="6" v-for="(item,index) in All" :key="index">
        {{item.name}}

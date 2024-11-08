@@ -51,6 +51,7 @@ public class MatchesListFromPuuid {
         int endIndex=page*18-1;
 
         JSONObject jsonObject = JSONObject.parseObject(getSummoners.getSummoners(Map.of("name",map.get("name"))));
+
         String puuId = jsonObject.getString("puuid");
         String url = "/lol-match-history/v1/products/lol/" + puuId + "/matches";
         String token = getGlobalTokenAndPort.getToken();

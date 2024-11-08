@@ -78,6 +78,8 @@ public class ClientWebSocket extends TextWebSocketHandler {
            JSONArray jsonArray = JSONArray.parseArray(message.getPayload());
            JSONObject jsonObject = jsonArray.getJSONObject(2);
            state=jsonObject.getString("data");
+           int sendMatch=0;
+           System.out.println("state = " + state);
 
            if (message.getPayload().contains("Lobby")) {
                if (!Objects.isNull(autoSearchMatch)&&!Objects.isNull(autoSearchMatch.getState())&&!autoSearchMatch.getState().isEmpty()&&autoSearchMatch.getState().equals("true")){
@@ -130,9 +132,6 @@ public class ClientWebSocket extends TextWebSocketHandler {
 
                }
            }
-
-           int sendMatch=0;
-
            if (message.getPayload().contains("ChampSelect")) {
 
                while (state.equals("ChampSelect")) {
@@ -256,8 +255,7 @@ public class ClientWebSocket extends TextWebSocketHandler {
                    }
                }
            }
-           if (message.getPayload().contains("InProgress")) {
-           }
+           if (message.getPayload().contains("InProgress")) {}
            if (message.getPayload().contains("PreEndOfGame")) {
                if (!Objects.isNull(autoContinueNextGame)&&!Objects.isNull(autoContinueNextGame.getAutoContinueNextGame())&&!autoContinueNextGame.getAutoContinueNextGame().isEmpty()) {
                    if (autoContinueNextGame.getAutoContinueNextGame().equals("true")) {
@@ -267,6 +265,9 @@ public class ClientWebSocket extends TextWebSocketHandler {
                        System.out.println("游戏结束,荣誉加一");
                    }
                }
+           }
+           if (message.getPayload().contains("WaitingForStats")) {
+               System.out.println(message.getPayload());
            }
            if (message.getPayload().contains("EndOfGame")){
                if (!Objects.isNull(autoContinueNextGame)&&!Objects.isNull(autoContinueNextGame.getAutoContinueNextGame())&&!autoContinueNextGame.getAutoContinueNextGame().isEmpty()) {
@@ -340,6 +341,24 @@ public class ClientWebSocket extends TextWebSocketHandler {
         int kk=0;
         for (String puuid : puuids) {
 
+//            JsonNode s=objectMapper.readTree(callApi.callApiGet(
+//                    "/lol-summoner/v2/summoners/puuid/"+puuid,
+//                    token,
+//                    port,
+//                    null
+//            ));
+//
+//            System.out.println(s);
+
+//            if (isLuanDou){
+//                callApi.callApiPost(
+//                        "/lol-chat/v1/conversations/" +id + "/messages",
+//                        token,
+//                        port,
+//                        Map.of("body",s.get("numberOfRolls").asText())
+//                );
+//            }
+
             OnePersonHistory onePersonHistory = new OnePersonHistory();
             JsonNode current=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v2/summoners/puuid/"+puuid,token,port,null));
             onePersonHistory.setName(current.get("gameName").asText());
@@ -381,7 +400,6 @@ public class ClientWebSocket extends TextWebSocketHandler {
             }
             kk++;
             System.out.println(callApi.callApiPost(
-
                     "/lol-chat/v1/conversations/" +id + "/messages",
                     token,
                     port,

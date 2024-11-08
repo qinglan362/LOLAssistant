@@ -10,4 +10,5 @@ import org.springframework.stereotype.Component;
 public class GetGlobalTokenAndPort {
     private String token;
     private  String port;
+    private String regin;
 }

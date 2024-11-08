@@ -25,6 +25,13 @@ public class  CallApi {
                  .asString();
          return response.getBody();
     }
+    public String callApiGetSpg(String url, String token, Map<String,Object> params) {
+        HttpResponse<String> response = Unirest.get(url)
+                .queryString(params)
+                .header("Authorization","Bearer "+token)
+                .asString();
+        return response.getBody();
+    }
 
     public JsonNode callApiGetJson(String url, String token, String port, Map<String,Object> params) {
         String Auth="riot:"+token;

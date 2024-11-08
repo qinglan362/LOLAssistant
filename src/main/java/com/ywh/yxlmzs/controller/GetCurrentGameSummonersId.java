@@ -1,5 +1,6 @@
 package com.ywh.yxlmzs.controller;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ywh.yxlmzs.entity.Champion;
@@ -51,6 +52,8 @@ public class GetCurrentGameSummonersId {
         System.out.println(rootNode);
 
         JsonNode myTeam=rootNode.get("myTeam");
+
+
 
         String myselfPuuid=objectMapper.readTree(callApi.callApiGet("/lol-summoner/v1/current-summoner",token,port,null)).get("puuid").asText();
 
